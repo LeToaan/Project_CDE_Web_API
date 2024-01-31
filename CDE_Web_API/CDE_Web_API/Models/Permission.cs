@@ -11,7 +11,6 @@ public class Permission
 
     [MaxLength(250)]
     public string Name { get; set; }
-
-    public int PositionGroupId { get; set; }
-    public virtual PositionGroup PositionGroup { get; set; }
+    public int ModuleId { get; set; }
+    public virtual Module Module { get; set; }
 }

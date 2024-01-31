@@ -21,13 +21,13 @@ public class Account
     public string Email { get; set; }
 
     [MaxLength(50)]
-    public string Phone { get; set; }
+    public string? Phone { get; set; }
 
     [MaxLength(50)]
-    public string Address { get; set; }
+    public string? Address { get; set; }
 
     [MaxLength(250)]
-    public string Photo { get; set; }
+    public string? Photo { get; set; }
 
     [MaxLength(250)]
     public string? Description { get; set; }
@@ -39,7 +39,7 @@ public class Account
     public int? Superior { get; set; }
 
     [MaxLength(250)]
-    public string SecurityCode { get; set; }
+    public string? SecurityCode { get; set; }
 
     public int AreaId { get; set; }
     public virtual Area Area { get; set; }

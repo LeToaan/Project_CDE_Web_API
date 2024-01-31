@@ -15,7 +15,7 @@ public class CDEDbContext : DbContext
     public DbSet<PositionTitle> PositionTitles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<Module> Modules { get; set; }
-
+    public DbSet<PermissionDetail> PermissionDetails { get; set; }
     public DbSet<Visit> Visits { get; set; }
     public DbSet<Distributor> Distributors { get; set; }
     public DbSet<Task> Tasks { get; set; }

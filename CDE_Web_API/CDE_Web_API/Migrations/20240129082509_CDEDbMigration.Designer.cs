@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CDE_Web_API.Migrations
 {
     [DbContext(typeof(CDEDbContext))]
-    [Migration("20240128124833_CDEDbMigration")]
+    [Migration("20240129082509_CDEDbMigration")]
     partial class CDEDbMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -275,6 +275,24 @@ namespace CDE_Web_API.Migrations
                     b.ToTable("Medias");
                 });
 
+            modelBuilder.Entity("CDE_Web_API.Models.Module", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Modules");
+                });
+
             modelBuilder.Entity("CDE_Web_API.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -335,19 +353,42 @@ namespace CDE_Web_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModuleId");
+
+                    b.ToTable("Permissions");
+                });
+
+            modelBuilder.Entity("CDE_Web_API.Models.PermissionDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
 
                     b.Property<int>("PositionGroupId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PermissionId");
+
                     b.HasIndex("PositionGroupId");
 
-                    b.ToTable("Permissions");
+                    b.ToTable("PermissionDetails");
                 });
 
             modelBuilder.Entity("CDE_Web_API.Models.PositionGroup", b =>
@@ -710,11 +751,30 @@ namespace CDE_Web_API.Migrations
 
             modelBuilder.Entity("CDE_Web_API.Models.Permission", b =>
                 {
+                    b.HasOne("CDE_Web_API.Models.Module", "Module")
+                        .WithMany()
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Module");
+                });
+
+            modelBuilder.Entity("CDE_Web_API.Models.PermissionDetail", b =>
+                {
+                    b.HasOne("CDE_Web_API.Models.Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CDE_Web_API.Models.PositionGroup", "PositionGroup")
                         .WithMany()
                         .HasForeignKey("PositionGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Permission");
 
                     b.Navigation("PositionGroup");
                 });
