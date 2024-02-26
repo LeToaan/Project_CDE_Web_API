@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CDE_Web_API.Migrations
 {
-    public partial class CDEDbMigration : Migration
+    public partial class CDEMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -50,19 +50,6 @@ namespace CDE_Web_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Modules",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Modules", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Notifications",
                 columns: table => new
                 {
@@ -75,6 +62,20 @@ namespace CDE_Web_API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Notifications", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PermissionModules",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    PermissionIds = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PermissionModules", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -123,15 +124,16 @@ namespace CDE_Web_API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    ModuleId = table.Column<int>(type: "int", nullable: false)
+                    PermissionMuduleId = table.Column<int>(type: "int", nullable: false),
+                    PermissionModulesId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Permissions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Permissions_Modules_ModuleId",
-                        column: x => x.ModuleId,
-                        principalTable: "Modules",
+                        name: "FK_Permissions_PermissionModules_PermissionModulesId",
+                        column: x => x.PermissionModulesId,
+                        principalTable: "PermissionModules",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -173,6 +175,7 @@ namespace CDE_Web_API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    PermissionIds = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PositionGroupId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -192,18 +195,19 @@ namespace CDE_Web_API.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Password = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Fullname = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Photo = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Superior = table.Column<int>(type: "int", nullable: true),
+                    Inferior = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityCode = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    AreaId = table.Column<int>(type: "int", nullable: false),
+                    AreaId = table.Column<int>(type: "int", nullable: true),
                     PositionGroupId = table.Column<int>(type: "int", nullable: false),
                     TokentId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -214,8 +218,7 @@ namespace CDE_Web_API.Migrations
                         name: "FK_Accounts_Areas_AreaId",
                         column: x => x.AreaId,
                         principalTable: "Areas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Accounts_PositionGroups_PositionGroupId",
                         column: x => x.PositionGroupId,
@@ -227,32 +230,6 @@ namespace CDE_Web_API.Migrations
                         column: x => x.TokentId,
                         principalTable: "Tokents",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PermissionDetails",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PermissionId = table.Column<int>(type: "int", nullable: false),
-                    PositionGroupId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PermissionDetails", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PermissionDetails_Permissions_PermissionId",
-                        column: x => x.PermissionId,
-                        principalTable: "Permissions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PermissionDetails_PositionGroups_PositionGroupId",
-                        column: x => x.PositionGroupId,
-                        principalTable: "PositionGroups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -526,19 +503,9 @@ namespace CDE_Web_API.Migrations
                 column: "StaffAccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PermissionDetails_PermissionId",
-                table: "PermissionDetails",
-                column: "PermissionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PermissionDetails_PositionGroupId",
-                table: "PermissionDetails",
-                column: "PositionGroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Permissions_ModuleId",
+                name: "IX_Permissions_PermissionModulesId",
                 table: "Permissions",
-                column: "ModuleId");
+                column: "PermissionModulesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PositionTitles_PositionGroupId",
@@ -611,7 +578,7 @@ namespace CDE_Web_API.Migrations
                 name: "NotifiUsers");
 
             migrationBuilder.DropTable(
-                name: "PermissionDetails");
+                name: "Permissions");
 
             migrationBuilder.DropTable(
                 name: "PositionTitles");
@@ -632,7 +599,7 @@ namespace CDE_Web_API.Migrations
                 name: "Notifications");
 
             migrationBuilder.DropTable(
-                name: "Permissions");
+                name: "PermissionModules");
 
             migrationBuilder.DropTable(
                 name: "SurveyRequests");
@@ -642,9 +609,6 @@ namespace CDE_Web_API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tasks");
-
-            migrationBuilder.DropTable(
-                name: "Modules");
 
             migrationBuilder.DropTable(
                 name: "Accounts");

@@ -1,13 +1,17 @@
 ﻿using AutoMapper;
 using BCrypt.Net;
 using CDE_Web_API.DTOs;
+using CDE_Web_API.Helpers;
 using CDE_Web_API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Web.Http.ModelBinding;
+using System.Text;
 
 namespace CDE_Web_API.Services;
 
@@ -32,25 +36,23 @@ public class AccountServiceImpl : AccountService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<IActionResult> resiter(AccountDTO accountDTO)
+    public async Task<IActionResult> register(AccountDTO accountDTO)
     {
-        var user = _mapper.Map<Account>(accountDTO);
-        var modelState = _httpContextAccessor.HttpContext?.Items["MS_ModelState"] as ModelStateDictionary;
-
+        Account user = _mapper.Map<Account>(accountDTO);
         try
         {
-            if (modelState != null && !modelState.IsValid)
-            {
-                var userExit = await _dbContext.Accounts.FirstOrDefaultAsync(u => u.Email == user.Email);
+            Thread thread = Thread.CurrentThread;
+            Console.WriteLine("thread: " + thread.Name);
+            Console.WriteLine("is thread pool thread" + thread.IsThreadPoolThread);
+                var userExit = _dbContext.Accounts.FirstOrDefault(u => u.Email == user.Email);
                 if(userExit != null)
                 {
                     return new BadRequestObjectResult(new { msg = "User already exists!" });
                 }
-                user.Email = accountDTO.Email;
-                user.Fullname = accountDTO.Fullname;
-                user.Password = BCrypt.Net.BCrypt.HashPassword("123456");
-                user.PositionGroupId = accountDTO.PositionGroupId;
-                user.Superior = accountDTO.Superior;
+
+                user.Password = GenaratePassword.CreatePassword(12);
+                user.PositionGroupId = 2;
+                user.Superior = 1;
                 user.Status = true;
                 user.Created = DateTime.Now;
                 user.AreaId = 1;
@@ -65,10 +67,7 @@ public class AccountServiceImpl : AccountService
                     return new OkObjectResult(new { result = false});
                 }
                 
-            }
-
-            return new BadRequestObjectResult(new { msg = "" });
-
+            
         }
         catch(Exception ex)
         {
@@ -76,4 +75,10 @@ public class AccountServiceImpl : AccountService
         }
         
     }
+
+    public Task<IActionResult> SignInAsync(AccountDTO accountDTO)
+    {
+        throw new NotImplementedException();
+    }
+
 }

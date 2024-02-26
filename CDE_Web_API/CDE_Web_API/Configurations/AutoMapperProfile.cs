@@ -10,17 +10,25 @@ public class AutoMapperProfile : Profile
     public AutoMapperProfile()
     {
         CreateMap<Account, AccountDTO>();
+        CreateMap<AccountDTO, Account>();
+        CreateMap<Account, UserDTO>();
+        CreateMap<UserDTO, Account>();
+        CreateMap<Account, StaffDTO>();
+        CreateMap<StaffDTO, Account>();
+        CreateMap<Account, AccountLoginDTO>();
+        CreateMap<AccountLoginDTO, Account>();
+        CreateMap<Account, AccountTokentDTO>();
+        CreateMap<AccountTokentDTO, Account>();
         CreateMap<Answer, AnswerDTO>();
         CreateMap<Area, AreaDTO>();
         CreateMap<Category, CategoryDTO>();
         CreateMap<CMS, CMSDTO>();
         CreateMap<Distributor, DistributorDTO>();
         CreateMap<Media, MediaDTO>();
-        CreateMap<Module, ModuleDTO>();
+        CreateMap<PermissionModule, ModuleDTO>();
         CreateMap<NotifiUser, NotifiUserDTO>();
         CreateMap<Notification, NotificationDTO>();
         CreateMap<Permission, PermissionDTO>();
-        CreateMap<PermissionDetail, PermissionDetailDTO>();
         CreateMap<PositionGroup, PositionGroupDTO>();
         CreateMap<PositionTitle, PositionTitleDTO>();
         CreateMap<Rate, RateDTO>();

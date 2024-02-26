@@ -34,10 +34,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Helpers\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <EditorConfigFiles Remove="C:\Users\ACER\OneDrive\Máy tính\Intership\CDE_Web_API\CDE_Web_API\CDE_Web_API\.editorconfig" />
 	</ItemGroup>
 

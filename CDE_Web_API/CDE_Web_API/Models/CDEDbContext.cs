@@ -1,10 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace CDE_Web_API.Models;
 
-public class CDEDbContext : DbContext
+public class CDEDbContext : IdentityDbContext<ApplicationUser>
 {
-    public CDEDbContext(DbContextOptions options) : base(options) { }
+    public CDEDbContext(DbContextOptions<CDEDbContext> options) : base(options) { }
 
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Tokent> Tokents { get; set; }
@@ -14,8 +17,7 @@ public class CDEDbContext : DbContext
     public DbSet<PositionGroup> PositionGroups { get; set; }
     public DbSet<PositionTitle> PositionTitles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
-    public DbSet<Module> Modules { get; set; }
-    public DbSet<PermissionDetail> PermissionDetails { get; set; }
+    public DbSet<PermissionModule> PermissionModules { get; set; }
     public DbSet<Visit> Visits { get; set; }
     public DbSet<Distributor> Distributors { get; set; }
     public DbSet<Task> Tasks { get; set; }
@@ -42,6 +44,11 @@ public class CDEDbContext : DbContext
             .HasForeignKey(t => t.Implement)
             .OnDelete(DeleteBehavior.NoAction);
 
+        modelBuilder.Entity<SurveyDetail>()
+            .HasOne<SurveyRequest>(t => t.SurveyRequest)
+            .WithMany()
+            .HasForeignKey(t => t.Id)
+            .OnDelete(DeleteBehavior.NoAction);
 
         base.OnModelCreating(modelBuilder);
     }

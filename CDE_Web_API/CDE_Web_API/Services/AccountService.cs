@@ -5,5 +5,7 @@ namespace CDE_Web_API.Services;
 
 public interface AccountService
 {
-    Task<IActionResult> resiter(AccountDTO accountDTO);
+    public Task<IActionResult> register(AccountDTO accountDTO);
+    public Task<IActionResult> SignInAsync(AccountDTO accountDTO);
+
 }

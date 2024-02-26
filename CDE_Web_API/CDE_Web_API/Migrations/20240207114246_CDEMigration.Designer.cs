@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CDE_Web_API.Migrations
 {
     [DbContext(typeof(CDEDbContext))]
-    [Migration("20240129082509_CDEDbMigration")]
-    partial class CDEDbMigration
+    [Migration("20240207114246_CDEMigration")]
+    partial class CDEMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,11 +33,10 @@ namespace CDE_Web_API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
-                    b.Property<int>("AreaId")
+                    b.Property<int?>("AreaId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("Created")
@@ -57,18 +56,18 @@ namespace CDE_Web_API.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<string>("Inferior")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Photo")
-                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -76,7 +75,6 @@ namespace CDE_Web_API.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SecurityCode")
-                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -275,24 +273,6 @@ namespace CDE_Web_API.Migrations
                     b.ToTable("Medias");
                 });
 
-            modelBuilder.Entity("CDE_Web_API.Models.Module", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Modules");
-                });
-
             modelBuilder.Entity("CDE_Web_API.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -353,22 +333,25 @@ namespace CDE_Web_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("ModuleId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<int>("PermissionModulesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PermissionMuduleId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ModuleId");
+                    b.HasIndex("PermissionModulesId");
 
                     b.ToTable("Permissions");
                 });
 
-            modelBuilder.Entity("CDE_Web_API.Models.PermissionDetail", b =>
+            modelBuilder.Entity("CDE_Web_API.Models.PermissionModule", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -376,19 +359,17 @@ namespace CDE_Web_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("PermissionId")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
-                    b.Property<int>("PositionGroupId")
-                        .HasColumnType("int");
+                    b.Property<string>("PermissionIds")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PermissionId");
-
-                    b.HasIndex("PositionGroupId");
-
-                    b.ToTable("PermissionDetails");
+                    b.ToTable("PermissionModules");
                 });
 
             modelBuilder.Entity("CDE_Web_API.Models.PositionGroup", b =>
@@ -421,6 +402,9 @@ namespace CDE_Web_API.Migrations
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("PermissionIds")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PositionGroupId")
                         .HasColumnType("int");
@@ -668,9 +652,7 @@ namespace CDE_Web_API.Migrations
                 {
                     b.HasOne("CDE_Web_API.Models.Area", "Area")
                         .WithMany()
-                        .HasForeignKey("AreaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AreaId");
 
                     b.HasOne("CDE_Web_API.Models.PositionGroup", "PositionGroup")
                         .WithMany()
@@ -751,32 +733,13 @@ namespace CDE_Web_API.Migrations
 
             modelBuilder.Entity("CDE_Web_API.Models.Permission", b =>
                 {
-                    b.HasOne("CDE_Web_API.Models.Module", "Module")
-                        .WithMany()
-                        .HasForeignKey("ModuleId")
+                    b.HasOne("CDE_Web_API.Models.PermissionModule", "PermissionModules")
+                        .WithMany("Permissions")
+                        .HasForeignKey("PermissionModulesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Module");
-                });
-
-            modelBuilder.Entity("CDE_Web_API.Models.PermissionDetail", b =>
-                {
-                    b.HasOne("CDE_Web_API.Models.Permission", "Permission")
-                        .WithMany()
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CDE_Web_API.Models.PositionGroup", "PositionGroup")
-                        .WithMany()
-                        .HasForeignKey("PositionGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Permission");
-
-                    b.Navigation("PositionGroup");
+                    b.Navigation("PermissionModules");
                 });
 
             modelBuilder.Entity("CDE_Web_API.Models.PositionTitle", b =>
@@ -883,6 +846,11 @@ namespace CDE_Web_API.Migrations
                     b.Navigation("Distributor");
 
                     b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("CDE_Web_API.Models.PermissionModule", b =>
+                {
+                    b.Navigation("Permissions");
                 });
 #pragma warning restore 612, 618
         }

@@ -8,9 +8,11 @@ public class Permission
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
-
     [MaxLength(250)]
     public string Name { get; set; }
-    public int ModuleId { get; set; }
-    public virtual Module Module { get; set; }
+
+    public int PermissionMuduleId { get; set; }
+
+    public virtual PermissionModule PermissionModules { get; set; }
+
 }
