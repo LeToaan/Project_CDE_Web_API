@@ -5,9 +5,9 @@ using System.Diagnostics;
 
 namespace CDE_Web_API.Models;
 
-public class CDEDbContext : IdentityDbContext<ApplicationUser>
+public class CDEDbContext : DbContext
 {
-    public CDEDbContext(DbContextOptions<CDEDbContext> options) : base(options) { }
+    public CDEDbContext(DbContextOptions options) : base(options) { }
 
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Tokent> Tokents { get; set; }

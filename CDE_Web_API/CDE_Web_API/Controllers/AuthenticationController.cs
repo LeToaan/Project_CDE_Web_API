@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using CDE_Web_API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Security.Claims;
 
 namespace CDE_Web_API.Controllers;
 
@@ -7,23 +11,24 @@ namespace CDE_Web_API.Controllers;
 [ApiController]
 public class AuthenticationController : ControllerBase
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
+   
     private readonly IConfiguration _configuration;
+    private AuthAccountService _authAccountService;
 
     public AuthenticationController(
-        UserManager<IdentityUser> userManager, 
-        RoleManager<IdentityRole> roleManager, 
+        AuthAccountService authAccountService,
         IConfiguration configuration)
     {
-        _userManager = userManager;
-        _roleManager = roleManager;
+        _authAccountService= authAccountService;
         _configuration = configuration;
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> register()
+    [Produces("application/json")]
+    [HttpGet("getAccount"), Authorize(Roles = "System")]
+    public async Task<IActionResult> getaccount()
     {
-        return Ok();
+        return Ok("okokokok");
     }
+
+
 }

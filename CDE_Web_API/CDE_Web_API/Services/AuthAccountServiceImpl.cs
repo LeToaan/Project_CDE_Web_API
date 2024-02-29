@@ -1,13 +1,18 @@
 ﻿using AutoMapper;
+using Castle.Core.Internal;
 using CDE_Web_API.DTOs;
 using CDE_Web_API.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Web.Http.ModelBinding;
+using System.Xml.Linq;
 
 namespace CDE_Web_API.Services;
 
@@ -17,16 +22,12 @@ public class AuthAccountServiceImpl : AuthAccountService
     private readonly IMapper _mapper;
     private IConfiguration _configuration;
     private IHttpContextAccessor _httpContextAccessor;
-    private readonly UserManager<ApplicationUser> userManager;
-    private readonly SignInManager<ApplicationUser> signInManager;
 
     public AuthAccountServiceImpl(
         IConfiguration configuration, 
         CDEDbContext dbContext, 
         IMapper mapper,
-        IHttpContextAccessor httpContextAccessor,
-        UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager
+        IHttpContextAccessor httpContextAccessor
         )
     {
        
@@ -34,8 +35,6 @@ public class AuthAccountServiceImpl : AuthAccountService
         _dbContext = dbContext;
         _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
-        this.userManager = userManager;
-        this.signInManager = signInManager;
     }
 
     public Task<IActionResult> register(AccountDTO accountDTO)
@@ -43,31 +42,70 @@ public class AuthAccountServiceImpl : AuthAccountService
         throw new NotImplementedException();
     }
 
-    public async Task<string> Login(AccountLoginDTO accountDTO)
+    public async Task<IActionResult> Login(AccountLoginDTO accountDTO)
     {
-            Account user = _mapper.Map<Account>(accountDTO);
-        var data = await _dbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(x => x.Email == user.Email);
-        var result = await signInManager.PasswordSignInAsync(data.Email, data.Password, false, false);
-            if(!result.Succeeded)
-            {
-                return string.Empty;
+        try
+        {
+            var modelState = _httpContextAccessor.HttpContext?.Items["MS_ModelState"] as ModelStateDictionary;
+                if (modelState != null && !modelState.IsValid)
+                {
+                    return new BadRequestObjectResult(modelState);
+                }
+                else
+                {
+                var user = await _dbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(x => x.Email == accountDTO.Email);
+
+                if(user.Email != accountDTO.Email && user.Password != accountDTO.Password) 
+                {
+                    return new BadRequestObjectResult(new {msg = "Login Failed!"});
+                }else
+                {
+                    var positionGroup = await _dbContext.PositionGroups.AsNoTracking().FirstOrDefaultAsync(p => p.Id == user.PositionGroupId);
+                    string tokent = CreateTokent(user.Email, positionGroup.Name);
+                    return new OkObjectResult(tokent);
+                }
             }
 
-            var authClaims = new List<Claim>
+        }
+        catch (Exception ex)
             {
-                new Claim(ClaimTypes.Email, data.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+                return new BadRequestObjectResult(ex.Message);
+            }
+    }
 
-            var authKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-            var tokent = new JwtSecurityToken
-                (
-                    issuer: _configuration["JWT:ValidIssuer"],
-                    audience: _configuration["JWT:ValidAudience"],
-                    expires: DateTime.Now.AddMinutes(30),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(authKey, SecurityAlgorithms.HmacSha512Signature)
-                );
-            return new JwtSecurityTokenHandler().WriteToken(tokent);
+    private string CreateTokent(string email, string positionGroup)
+    {
+        List<Claim> claims = new List<Claim> {
+            new Claim(ClaimTypes.Name, email),
+            new Claim(ClaimTypes.Role, positionGroup),
+        };
+
+        var authKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JWT:Secret").Value));
+        var creds = new SigningCredentials(authKey, SecurityAlgorithms.HmacSha512Signature);
+        var expiry = DateTime.Now.AddHours(1);
+
+        var tokent = new JwtSecurityToken
+            (
+                
+                claims : claims,
+                expires: expiry,
+                signingCredentials: creds
+            );
+        var jwt = new JwtSecurityTokenHandler().WriteToken(tokent);
+        return jwt;
+    }
+
+    public async Task<IActionResult> getAccount(string email)
+    {
+        try
+        {
+            var user = await _dbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
+
+            return new OkObjectResult(user);
+        }
+        catch
+        {
+            return new BadRequestObjectResult(new { msg = "loiiii" });
+        }
     }
 }

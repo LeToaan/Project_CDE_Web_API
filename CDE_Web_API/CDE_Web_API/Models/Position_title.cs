@@ -14,7 +14,7 @@ public class PositionTitle
 
     public string? PermissionIds { get; set; }
     public int PositionGroupId { get; set; }
-    public virtual PositionGroup PositionGroup { get; set; }
+    public virtual PositionGroup? PositionGroup { get; set; }
 
     public Dictionary<int, Permission> Permissions = new Dictionary<int, Permission>();
 }

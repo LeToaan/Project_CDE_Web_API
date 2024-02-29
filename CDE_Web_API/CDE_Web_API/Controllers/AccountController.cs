@@ -1,6 +1,7 @@
 ﻿using Castle.Core.Internal;
 using CDE_Web_API.DTOs;
 using CDE_Web_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CDE_Web_API.Controllers;
@@ -37,11 +38,8 @@ public class AccountController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] AccountLoginDTO accountDTO)
     {
-        var result = await authAccountService.Login(accountDTO);
-        if (string.IsNullOrEmpty(result))
-        {
-            return Unauthorized();
-        }
-        return Ok(result);
+        return await authAccountService.Login(accountDTO);
     }
+
+  
 }

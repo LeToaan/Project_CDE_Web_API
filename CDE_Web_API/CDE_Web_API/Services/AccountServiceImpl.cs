@@ -50,7 +50,7 @@ public class AccountServiceImpl : AccountService
                     return new BadRequestObjectResult(new { msg = "User already exists!" });
                 }
 
-                user.Password = GenaratePassword.CreatePassword(12);
+            user.Password = GenaratePassword.CreatePassword(12);
                 user.PositionGroupId = 2;
                 user.Superior = 1;
                 user.Status = true;

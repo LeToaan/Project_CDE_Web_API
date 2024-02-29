@@ -12,4 +12,7 @@ public class PositionGroup
 
     [MaxLength(250)]
     public string Name { get; set; }
+
+    public virtual ICollection<PositionTitle> PositionTitiles { get; set; } = new List<PositionTitle>();
+
 }

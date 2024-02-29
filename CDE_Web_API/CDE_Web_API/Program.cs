@@ -1,39 +1,47 @@
 using CDE_Web_API.Models;
 using CDE_Web_API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<CDEDbContext>().AddDefaultTokenProviders();
 // For Entity Framework
-builder.Services.AddDbContext<CDEDbContext>(option => option.UseLazyLoadingProxies().UseSqlServer(connectionString));
+builder.Services.AddDbContext<CDEDbContext>(option => option.UseLazyLoadingProxies().UseSqlServer(connectionString), ServiceLifetime.Singleton);
 
-// Adding Authentication
-builder.Services.AddAuthentication(options =>
+builder.Services.AddSwaggerGen(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:ValidAudience"],
-        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
-    };
+        Description = "Standard Authorization header using the Bearer scheme (\"bearer {tokent}\")",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
+// Adding Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(option =>
+    {
+        option.SaveToken = true;
+        option.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                builder.Configuration.GetSection("JWT:Secret").Value)),
+            ValidateAudience = false,
+            ValidateIssuer = false,
+        };
+    });
 
 builder.Services.AddScoped<AccountService, AccountServiceImpl>();
 builder.Services.AddScoped<AuthAccountService, AuthAccountServiceImpl>();
@@ -42,7 +50,7 @@ builder.Services.AddScoped<AuthAccountService, AuthAccountServiceImpl>();
 builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
@@ -67,6 +75,5 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseRouting();
 
 app.Run();

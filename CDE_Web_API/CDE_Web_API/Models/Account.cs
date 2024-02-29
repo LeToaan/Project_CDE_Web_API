@@ -39,15 +39,15 @@ public class Account
 
     public string? Inferior { get; set; }
 
-    [MaxLength(250)]
     public string? SecurityCode { get; set; }
 
     public int? AreaId { get; set; }
     public virtual Area? Area { get; set; }
 
-    public int PositionGroupId { get; set; }
-    public virtual PositionGroup PositionGroup { get; set; }
+    public int? PositionGroupId { get; set; }
+    public virtual PositionGroup? PositionGroup { get; set; }
 
     public int? TokentId { get; set; }
     public virtual Tokent? Tokent { get; set; }
+
 }
