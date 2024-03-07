@@ -2,7 +2,7 @@
 
 namespace CDE_Web_API.DTOs;
 
-public class AccountDTO
+public class AccountSalesDTO
 {
     //public int Id { get; set; }
 
@@ -20,11 +20,12 @@ public class AccountDTO
 
     //public string? Description { get; set; }
 
-    public bool? Status { get; set; }
+    // public bool? Status { get; set; }
 
     // public DateTime? Created { get; set; }
     [Required]
     public int? Superior { get; set; }
+    public string? Inferior { get; set; }
 
     //public string? SecurityCode { get; set; }
 

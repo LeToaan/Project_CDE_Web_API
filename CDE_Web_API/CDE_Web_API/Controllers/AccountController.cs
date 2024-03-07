@@ -23,8 +23,16 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("register")]
-    public async Task<IActionResult> register([FromBody] AccountDTO accountDTO)
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] AccountLoginDTO accountDTO)
+    {
+        return await authAccountService.Login(accountDTO);
+    }
+
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [HttpPost("create_user"), Authorize(Roles = "System,Sales")]
+    public async Task<IActionResult> create_user([FromBody] AccountDTO accountDTO)
     {
         if (!ModelState.IsValid)
         {
@@ -35,11 +43,27 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] AccountLoginDTO accountDTO)
+    [HttpPut("update_user"), Authorize(Roles = "System,Sales")]
+    public async Task<IActionResult> update_user([FromBody] AccountDTO accountDTO)
     {
-        return await authAccountService.Login(accountDTO);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return await accountService.update_user(accountDTO);
     }
 
-  
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [HttpPost("create_sales"), Authorize(Roles = "System")]
+    public async Task<IActionResult> create_sales([FromBody] AccountSalesDTO accountSalesDTO)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return await accountService.creater_sales(accountSalesDTO);
+    }
+
+
 }

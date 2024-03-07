@@ -57,8 +57,9 @@ public class AuthAccountServiceImpl : AuthAccountService
 
                 if(user.Email != accountDTO.Email && user.Password != accountDTO.Password) 
                 {
-                    return new BadRequestObjectResult(new {msg = "Login Failed!"});
-                }else
+                    return new BadRequestObjectResult(modelState);
+                }
+                else
                 {
                     var positionGroup = await _dbContext.PositionGroups.AsNoTracking().FirstOrDefaultAsync(p => p.Id == user.PositionGroupId);
                     string tokent = CreateTokent(user.Email, positionGroup.Name);
@@ -95,17 +96,13 @@ public class AuthAccountServiceImpl : AuthAccountService
         return jwt;
     }
 
-    public async Task<IActionResult> getAccount(string email)
+    public string getAccount()
     {
-        try
+        var result = string.Empty;
+        if(_httpContextAccessor.HttpContext != null)
         {
-            var user = await _dbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
-
-            return new OkObjectResult(user);
+            result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
         }
-        catch
-        {
-            return new BadRequestObjectResult(new { msg = "loiiii" });
-        }
+        return result;
     }
 }

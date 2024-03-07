@@ -24,10 +24,11 @@ public class AuthenticationController : ControllerBase
     }
 
     [Produces("application/json")]
-    [HttpGet("getAccount"), Authorize(Roles = "System")]
-    public async Task<IActionResult> getaccount()
+    [HttpGet("getMe"), Authorize]
+    public ActionResult<string> getMe()
     {
-        return Ok("okokokok");
+        var email = _authAccountService.getAccount();
+        return Ok(email);
     }
 
 
