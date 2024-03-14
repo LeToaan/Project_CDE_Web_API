@@ -43,7 +43,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update_user"), Authorize(Roles = "System,Sales")]
+    [HttpPut("update_user"), Authorize]
     public async Task<IActionResult> update_user([FromBody] AccountDTO accountDTO)
     {
         if (!ModelState.IsValid)

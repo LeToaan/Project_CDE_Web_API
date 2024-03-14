@@ -55,7 +55,7 @@ public class AuthAccountServiceImpl : AuthAccountService
                 {
                 var user = await _dbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(x => x.Email == accountDTO.Email);
 
-                if(user.Email != accountDTO.Email && user.Password != accountDTO.Password) 
+                if(user.Email != accountDTO.Email || user.Password != accountDTO.Password) 
                 {
                     return new BadRequestObjectResult(modelState);
                 }

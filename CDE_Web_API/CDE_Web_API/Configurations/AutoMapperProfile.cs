@@ -23,9 +23,13 @@ public class AutoMapperProfile : Profile
         CreateMap<AccountTokentDTO, Account>();
         CreateMap<Answer, AnswerDTO>();
         CreateMap<Area, AreaDTO>();
+        CreateMap<AreaDTO, Area>();
+
         CreateMap<Category, CategoryDTO>();
         CreateMap<CMS, CMSDTO>();
         CreateMap<Distributor, DistributorDTO>();
+        CreateMap<DistributorDTO, Distributor>();
+
         CreateMap<Media, MediaDTO>();
         CreateMap<PermissionModule, ModuleDTO>();
         CreateMap<NotifiUser, NotifiUserDTO>();

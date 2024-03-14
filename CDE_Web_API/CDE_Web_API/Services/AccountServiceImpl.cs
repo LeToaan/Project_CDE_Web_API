@@ -57,7 +57,7 @@ public class AccountServiceImpl : AccountService
                     return new BadRequestObjectResult(new { msg = "User already exists!" });
                 }
 
-            user.Password = GenaratePassword.CreatePassword(12);
+            user.Password = "0123456";
                 user.Superior = 1;
                 user.Status = true;
                 user.Created = DateTime.Now;
@@ -132,7 +132,7 @@ public class AccountServiceImpl : AccountService
                 return new BadRequestObjectResult(new { msg = "User already exists!" });
             }
 
-            user.Password = GenaratePassword.CreatePassword(12);
+            user.Password = "0123456";
             user.Created = DateTime.Now;
             user.AreaId = 1;
 

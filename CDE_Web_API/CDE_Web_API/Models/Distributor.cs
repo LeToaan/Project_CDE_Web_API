@@ -13,7 +13,7 @@ public class Distributor
     public string Name { get; set; }
 
     [MaxLength(250)]
-    public string Address { get; set; }
+    public string SaleManagement { get; set; }
 
     [MaxLength(250)]
     public string Email { get; set; }
