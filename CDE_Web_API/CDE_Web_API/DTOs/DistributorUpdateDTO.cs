@@ -1,10 +1,9 @@
 ﻿namespace CDE_Web_API.DTOs;
 
-public class DistributorDTO
+public class DistributorUpdateDTO
 {
     public string Name { get; set; }
     public string Email { get; set; }
-    public string Address { get; set; }
     public string Phone { get; set; }
     public int SaleManagement { get; set; }
     public string Sales { get; set; }

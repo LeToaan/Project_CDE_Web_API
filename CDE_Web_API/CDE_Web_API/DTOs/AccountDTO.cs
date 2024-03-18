@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CDE_Web_API.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace CDE_Web_API.DTOs;
 
@@ -20,17 +21,15 @@ public class AccountDTO
 
     //public string? Description { get; set; }
 
-    public bool? Status { get; set; }
 
-    // public DateTime? Created { get; set; }
-    [Required]
-    public int? Superior { get; set; }
 
     //public string? SecurityCode { get; set; }
 
     //public int AreaId { get; set; }
     [Required]
-    public int PositionGroupId { get; set; }
+    public int positionTitleId { get; set; }
+    public bool? Status { get; set; }
+
 
     //public int? TokentId { get; set; }
 }

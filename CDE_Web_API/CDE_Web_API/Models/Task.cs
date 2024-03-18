@@ -13,7 +13,7 @@ public class Task
     public string Title { get; set; }
 
     [MaxLength(250)]
-    public string File { get; set; }
+    public string? File { get; set; }
 
     [MaxLength(1000)]
     public string Description { get; set; }
@@ -25,13 +25,16 @@ public class Task
     public DateTime? DateEnd { get; set; }
 
     [Required]
-    public int Report { get; set; }
+    public int? Report { get; set; }
     public virtual Account ReportAccount { get; set; }
 
     [Required]
-    public int Implement { get; set; }
+    public int? Implement { get; set; }
     public virtual Account ImplementAccount { get; set; }
 
-    public int CategoryId { get; set; }
+    public int? CategoryId { get; set; }
     public virtual Category Category { get; set; }
+
+    public int VisitId { get; set; }
+    public virtual Visit Visit { get; set; }
 }

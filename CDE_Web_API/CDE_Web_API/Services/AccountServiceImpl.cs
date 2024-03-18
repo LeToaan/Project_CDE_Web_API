@@ -57,12 +57,18 @@ public class AccountServiceImpl : AccountService
                     return new BadRequestObjectResult(new { msg = "User already exists!" });
                 }
 
-            user.Password = "0123456";
-                user.Superior = 1;
+                var position_title = await _dbContext.PositionTitles.FirstOrDefaultAsync(p => p.Id == user.PositionTitleId);
+            if(position_title.PositionGroupId != 4) 
+            {
+                return new BadRequestObjectResult(new { msg = "Just Position Guest!!" });
+            }
+            else
+            {
+                user.PositionGroupId = 4;
+            }
+                user.Password = "0123456";
                 user.Status = true;
                 user.Created = DateTime.Now;
-                user.AreaId = 1;
-                user.PositionGroupId = 2;
 
                 _dbContext.Accounts.Add(user);
                 if(await _dbContext.SaveChangesAsync() > 0)
@@ -83,7 +89,7 @@ public class AccountServiceImpl : AccountService
     }
 
 
-    public async Task<IActionResult> update_user(AccountDTO accountDTO)
+    public async Task<IActionResult> update_user(AccountDTO accountDTO, int id)
     {
         Account user = _mapper.Map<Account>(accountDTO);
          try
@@ -92,25 +98,37 @@ public class AccountServiceImpl : AccountService
             Console.WriteLine("thread: " + thread.Name);
             Console.WriteLine("is thread pool thread" + thread.IsThreadPoolThread);
             var email = _authAccountService.getAccount();
-                var account = _dbContext.Accounts.FirstOrDefault(u => u.Email == email);
-            var user_ = _dbContext.Accounts.FirstOrDefault(u => u.Email == user.Email);
-            if (account != null )
+                var user_ = _dbContext.Accounts.FirstOrDefault(u => u.Id == id);
+            if (user != null )
+            {
+                var position_title = await _dbContext.PositionTitles.FirstOrDefaultAsync(p => p.Id == user.PositionTitleId);
+                if (position_title.PositionGroupId != 4)
                 {
-                
+                    return new BadRequestObjectResult(new { msg = "Just Position Guest!!" });
+                }
+                else
+                {
+                    user_.PositionGroupId = 4;
+                }
+                    user_.PositionTitleId = user.PositionTitleId;
                     user_.Fullname = user.Fullname;
                     user_.Email = user.Email;
-                    user_.PositionGroupId = user.PositionGroupId;
                     user_.Status = user.Status;
-                }
-                _dbContext.Entry(user_).State = EntityState.Modified;
-            if (await _dbContext.SaveChangesAsync() > 0)
-            {
-                return new OkObjectResult(new { msg = true });
+                    _dbContext.Entry(user_).State = EntityState.Modified;
+                    if (await _dbContext.SaveChangesAsync() > 0)
+                                    {
+                                        return new OkObjectResult(new { msg = true });
+                                    }
+                                    else
+                                    {
+                                        return new BadRequestObjectResult(new { msg = false });
+                                    }
             }
             else
             {
-                return new BadRequestObjectResult(new { msg = false });
+                return new BadRequestObjectResult(new { msg = "User not exist!" });
             }
+                
         }
         catch(Exception ex)
         {
@@ -132,10 +150,17 @@ public class AccountServiceImpl : AccountService
                 return new BadRequestObjectResult(new { msg = "User already exists!" });
             }
 
+            var position = await _dbContext.PositionTitles.FirstOrDefaultAsync(p => p.Id == user.PositionTitleId);
+            if (position.PositionGroupId != 2)
+            {
+                return new BadRequestObjectResult(new { msg = "Just Position Sales!" });
+            }else
+            {
+                user.PositionGroupId = position.PositionGroupId;
+
+            }
             user.Password = "0123456";
             user.Created = DateTime.Now;
-            user.AreaId = 1;
-
             _dbContext.Accounts.Add(user);
             if (await _dbContext.SaveChangesAsync() > 0)
             {
@@ -146,6 +171,64 @@ public class AccountServiceImpl : AccountService
                 return new OkObjectResult(new { result = false });
             }
 
+
+        }
+        catch (Exception ex)
+        {
+            return new BadRequestObjectResult(new { msg = ex.Message });
+        }
+    }
+
+    public async Task<IActionResult> update_sales(AccountSalesUpdateDTO accountSalesDTO, int id)
+    {
+        Account user = _mapper.Map<Account>(accountSalesDTO);
+        try
+        {
+            Thread thread = Thread.CurrentThread;
+            Console.WriteLine("thread: " + thread.Name);
+            Console.WriteLine("is thread pool thread" + thread.IsThreadPoolThread);
+            var email = _authAccountService.getAccount();
+            var account = _dbContext.Accounts.FirstOrDefault(a => a.Email == email);
+            var user_ = _dbContext.Accounts.FirstOrDefault(u => u.Id == id);
+            if (user_ != null && user_.PositionGroupId == 2)
+            {
+                if (account.PositionGroupId == 1)
+                {
+                    var position = await _dbContext.PositionTitles.FirstOrDefaultAsync(p => p.Id == user.PositionTitleId);
+                    var distributor = await _dbContext.Accounts.FirstOrDefaultAsync(d => d.Id == user.Id);
+                    if (position.PositionGroupId != 2 && distributor.PositionGroupId != 3)
+                    {
+                        return new BadRequestObjectResult(new { msg = "Just Position Sales!" });
+                    }
+                    else
+                    {
+                        user_.PositionTitleId = user.PositionTitleId;
+                        user_.DistributorId = user.DistributorId;
+                    }
+                    user_.Fullname = user.Fullname;
+                    user_.Email = user.Email;
+                    user_.Status = user.Status;
+                    _dbContext.Entry(user_).State = EntityState.Modified;
+                    if (await _dbContext.SaveChangesAsync() > 0)
+                    {
+                        return new OkObjectResult(new { msg = true });
+                    }
+                    else
+                    {
+                        return new BadRequestObjectResult(new { msg = false });
+                    }
+                }
+                else
+                {
+                    return new BadRequestObjectResult(new { msg = "You are not qualified!" });
+                }
+
+
+            }
+            else
+            {
+                return new BadRequestObjectResult(new { msg = "User not exist!" });
+            }
 
         }
         catch (Exception ex)

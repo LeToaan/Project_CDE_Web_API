@@ -47,6 +47,7 @@ builder.Services.AddScoped<AccountService, AccountServiceImpl>();
 builder.Services.AddScoped<AuthAccountService, AuthAccountServiceImpl>();
 builder.Services.AddScoped<AreaService, AreaServiceImpl>();
 builder.Services.AddScoped<DistributorService, DistributorServiceImpl>();
+builder.Services.AddScoped<PositionTitleService, PositionTitleServiceImpl>();
 
 
 builder.Services.AddCors();

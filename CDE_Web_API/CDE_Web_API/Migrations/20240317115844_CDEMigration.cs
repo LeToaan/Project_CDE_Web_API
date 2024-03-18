@@ -97,7 +97,7 @@ namespace CDE_Web_API.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RefreshToken = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false)
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -145,21 +145,17 @@ namespace CDE_Web_API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    SaleManagement = table.Column<int>(type: "int", maxLength: 250, nullable: false),
+                    Sales = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    AreaId = table.Column<int>(type: "int", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
                     PositionGroupId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Distributors", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Distributors_Areas_AreaId",
-                        column: x => x.AreaId,
-                        principalTable: "Areas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Distributors_PositionGroups_PositionGroupId",
                         column: x => x.PositionGroupId,
@@ -175,6 +171,7 @@ namespace CDE_Web_API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    created = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PermissionIds = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PositionGroupId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -206,9 +203,11 @@ namespace CDE_Web_API.Migrations
                     Created = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Superior = table.Column<int>(type: "int", nullable: true),
                     Inferior = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityCode = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    SecurityCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PositionTitleId = table.Column<int>(type: "int", nullable: true),
+                    DistributorId = table.Column<int>(type: "int", nullable: true),
                     AreaId = table.Column<int>(type: "int", nullable: true),
-                    PositionGroupId = table.Column<int>(type: "int", nullable: false),
+                    PositionGroupId = table.Column<int>(type: "int", nullable: true),
                     TokentId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -223,13 +222,37 @@ namespace CDE_Web_API.Migrations
                         name: "FK_Accounts_PositionGroups_PositionGroupId",
                         column: x => x.PositionGroupId,
                         principalTable: "PositionGroups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Accounts_Tokents_TokentId",
                         column: x => x.TokentId,
                         principalTable: "Tokents",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Visits",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Time = table.Column<short>(type: "smallint", nullable: true),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Intent = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Status = table.Column<short>(type: "smallint", nullable: true),
+                    Creator = table.Column<int>(type: "int", nullable: false),
+                    Guest = table.Column<int>(type: "int", nullable: true),
+                    DistributorId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Visits", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Visits_Distributors_DistributorId",
+                        column: x => x.DistributorId,
+                        principalTable: "Distributors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -316,14 +339,15 @@ namespace CDE_Web_API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    File = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    File = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     Status = table.Column<short>(type: "smallint", nullable: true),
                     DateStart = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DateEnd = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Report = table.Column<int>(type: "int", nullable: false),
                     Implement = table.Column<int>(type: "int", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                    CategoryId = table.Column<int>(type: "int", nullable: true),
+                    VisitId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -342,6 +366,11 @@ namespace CDE_Web_API.Migrations
                         name: "FK_Tasks_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Tasks_Visits_VisitId",
+                        column: x => x.VisitId,
+                        principalTable: "Visits",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -371,10 +400,8 @@ namespace CDE_Web_API.Migrations
                 name: "SurveyDetails",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     SurveyId = table.Column<int>(type: "int", nullable: false),
-                    SurveyRequestId = table.Column<int>(type: "int", nullable: false),
                     User = table.Column<int>(type: "int", nullable: false),
                     UserAccountId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -386,13 +413,12 @@ namespace CDE_Web_API.Migrations
                         column: x => x.UserAccountId,
                         principalTable: "Accounts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SurveyDetails_SurveyRequests_SurveyRequestId",
-                        column: x => x.SurveyRequestId,
+                        name: "FK_SurveyDetails_SurveyRequests_Id",
+                        column: x => x.Id,
                         principalTable: "SurveyRequests",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -425,38 +451,6 @@ namespace CDE_Web_API.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Visits",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Time = table.Column<short>(type: "smallint", nullable: true),
-                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Intent = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    Status = table.Column<short>(type: "smallint", nullable: true),
-                    Creator = table.Column<int>(type: "int", nullable: false),
-                    Guest = table.Column<int>(type: "int", nullable: true),
-                    DistributorId = table.Column<int>(type: "int", nullable: false),
-                    TaskId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Visits", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Visits_Distributors_DistributorId",
-                        column: x => x.DistributorId,
-                        principalTable: "Distributors",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Visits_Tasks_TaskId",
-                        column: x => x.TaskId,
-                        principalTable: "Tasks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Accounts_AreaId",
                 table: "Accounts",
@@ -481,11 +475,6 @@ namespace CDE_Web_API.Migrations
                 name: "IX_CMSs_CreatorAccountId",
                 table: "CMSs",
                 column: "CreatorAccountId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Distributors_AreaId",
-                table: "Distributors",
-                column: "AreaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Distributors_PositionGroupId",
@@ -523,11 +512,6 @@ namespace CDE_Web_API.Migrations
                 column: "TaskId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SurveyDetails_SurveyRequestId",
-                table: "SurveyDetails",
-                column: "SurveyRequestId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_SurveyDetails_UserAccountId",
                 table: "SurveyDetails",
                 column: "UserAccountId");
@@ -553,14 +537,14 @@ namespace CDE_Web_API.Migrations
                 column: "Report");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tasks_VisitId",
+                table: "Tasks",
+                column: "VisitId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Visits_DistributorId",
                 table: "Visits",
                 column: "DistributorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Visits_TaskId",
-                table: "Visits",
-                column: "TaskId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -593,37 +577,37 @@ namespace CDE_Web_API.Migrations
                 name: "UserLists");
 
             migrationBuilder.DropTable(
-                name: "Visits");
-
-            migrationBuilder.DropTable(
                 name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "PermissionModules");
 
             migrationBuilder.DropTable(
-                name: "SurveyRequests");
-
-            migrationBuilder.DropTable(
-                name: "Distributors");
-
-            migrationBuilder.DropTable(
                 name: "Tasks");
 
             migrationBuilder.DropTable(
-                name: "Accounts");
+                name: "SurveyRequests");
 
             migrationBuilder.DropTable(
                 name: "Categories");
 
             migrationBuilder.DropTable(
+                name: "Visits");
+
+            migrationBuilder.DropTable(
+                name: "Accounts");
+
+            migrationBuilder.DropTable(
+                name: "Distributors");
+
+            migrationBuilder.DropTable(
                 name: "Areas");
 
             migrationBuilder.DropTable(
-                name: "PositionGroups");
+                name: "Tokents");
 
             migrationBuilder.DropTable(
-                name: "Tokents");
+                name: "PositionGroups");
         }
     }
 }

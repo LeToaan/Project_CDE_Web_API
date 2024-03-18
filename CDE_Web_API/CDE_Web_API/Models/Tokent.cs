@@ -7,7 +7,6 @@ public class Tokent
     [Key]
     public int Id { get; set; }
 
-    [MaxLength(250)]
     public string RefreshToken { get; set; }
 
 }

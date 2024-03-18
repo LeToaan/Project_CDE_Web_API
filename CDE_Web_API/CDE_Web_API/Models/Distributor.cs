@@ -13,7 +13,10 @@ public class Distributor
     public string Name { get; set; }
 
     [MaxLength(250)]
-    public string SaleManagement { get; set; }
+    public int SaleManagement { get; set; }
+
+    [MaxLength(250)]
+    public string Sales { get; set; }
 
     [MaxLength(250)]
     public string Email { get; set; }
@@ -22,8 +25,10 @@ public class Distributor
     public string Phone { get; set; }
 
     [Required]
-    public int AreaId { get; set; }
-    public virtual Area Area { get; set; }
+    public string Address { get; set; }
+
+    [Required]
+    public bool Status { get; set; }
 
     [Required]
     public int PositionGroupId { get; set; }

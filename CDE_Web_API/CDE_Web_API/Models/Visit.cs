@@ -27,7 +27,5 @@ public class Visit
     public int DistributorId { get; set; }
     public virtual Distributor Distributor { get; set; }
 
-    [Required]
-    public int TaskId { get; set; }
-    public virtual Task Task { get; set; }
+    
 }

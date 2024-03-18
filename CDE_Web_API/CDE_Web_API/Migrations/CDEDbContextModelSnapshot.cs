@@ -44,6 +44,9 @@ namespace CDE_Web_API.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<int?>("DistributorId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -69,12 +72,14 @@ namespace CDE_Web_API.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<int>("PositionGroupId")
+                    b.Property<int?>("PositionGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PositionTitleId")
                         .HasColumnType("int");
 
                     b.Property<string>("SecurityCode")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("Status")
                         .HasColumnType("bit");
@@ -220,11 +225,7 @@ namespace CDE_Web_API.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<int>("AreaId")
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -244,9 +245,19 @@ namespace CDE_Web_API.Migrations
                     b.Property<int>("PositionGroupId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<int>("SaleManagement")
+                        .HasMaxLength(250)
+                        .HasColumnType("int");
 
-                    b.HasIndex("AreaId");
+                    b.Property<string>("Sales")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("PositionGroupId");
 
@@ -407,6 +418,9 @@ namespace CDE_Web_API.Migrations
                     b.Property<int>("PositionGroupId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("created")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PositionGroupId");
@@ -457,12 +471,7 @@ namespace CDE_Web_API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<int>("SurveyId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SurveyRequestId")
                         .HasColumnType("int");
 
                     b.Property<int>("User")
@@ -472,8 +481,6 @@ namespace CDE_Web_API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SurveyRequestId");
 
                     b.HasIndex("UserAccountId");
 
@@ -523,7 +530,7 @@ namespace CDE_Web_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DateEnd")
@@ -538,14 +545,15 @@ namespace CDE_Web_API.Migrations
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("File")
-                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<int>("Implement")
+                    b.Property<int?>("Implement")
+                        .IsRequired()
                         .HasColumnType("int");
 
-                    b.Property<int>("Report")
+                    b.Property<int?>("Report")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<short?>("Status")
@@ -556,6 +564,9 @@ namespace CDE_Web_API.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<int>("VisitId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
@@ -563,6 +574,8 @@ namespace CDE_Web_API.Migrations
                     b.HasIndex("Implement");
 
                     b.HasIndex("Report");
+
+                    b.HasIndex("VisitId");
 
                     b.ToTable("Tasks");
                 });
@@ -577,8 +590,7 @@ namespace CDE_Web_API.Migrations
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -631,17 +643,12 @@ namespace CDE_Web_API.Migrations
                     b.Property<short?>("Status")
                         .HasColumnType("smallint");
 
-                    b.Property<int>("TaskId")
-                        .HasColumnType("int");
-
                     b.Property<short?>("Time")
                         .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DistributorId");
-
-                    b.HasIndex("TaskId");
 
                     b.ToTable("Visits");
                 });
@@ -654,9 +661,7 @@ namespace CDE_Web_API.Migrations
 
                     b.HasOne("CDE_Web_API.Models.PositionGroup", "PositionGroup")
                         .WithMany()
-                        .HasForeignKey("PositionGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PositionGroupId");
 
                     b.HasOne("CDE_Web_API.Models.Tokent", "Tokent")
                         .WithMany()
@@ -693,19 +698,11 @@ namespace CDE_Web_API.Migrations
 
             modelBuilder.Entity("CDE_Web_API.Models.Distributor", b =>
                 {
-                    b.HasOne("CDE_Web_API.Models.Area", "Area")
-                        .WithMany()
-                        .HasForeignKey("AreaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("CDE_Web_API.Models.PositionGroup", "PositionGroup")
                         .WithMany()
                         .HasForeignKey("PositionGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Area");
 
                     b.Navigation("PositionGroup");
                 });
@@ -743,7 +740,7 @@ namespace CDE_Web_API.Migrations
             modelBuilder.Entity("CDE_Web_API.Models.PositionTitle", b =>
                 {
                     b.HasOne("CDE_Web_API.Models.PositionGroup", "PositionGroup")
-                        .WithMany()
+                        .WithMany("PositionTitiles")
                         .HasForeignKey("PositionGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -774,8 +771,8 @@ namespace CDE_Web_API.Migrations
                 {
                     b.HasOne("CDE_Web_API.Models.SurveyRequest", "SurveyRequest")
                         .WithMany()
-                        .HasForeignKey("SurveyRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("CDE_Web_API.Models.Account", "UserAccount")
@@ -804,9 +801,7 @@ namespace CDE_Web_API.Migrations
                 {
                     b.HasOne("CDE_Web_API.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CategoryId");
 
                     b.HasOne("CDE_Web_API.Models.Account", "ImplementAccount")
                         .WithMany()
@@ -820,11 +815,19 @@ namespace CDE_Web_API.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("CDE_Web_API.Models.Visit", "Visit")
+                        .WithMany()
+                        .HasForeignKey("VisitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Category");
 
                     b.Navigation("ImplementAccount");
 
                     b.Navigation("ReportAccount");
+
+                    b.Navigation("Visit");
                 });
 
             modelBuilder.Entity("CDE_Web_API.Models.Visit", b =>
@@ -835,20 +838,17 @@ namespace CDE_Web_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CDE_Web_API.Models.Task", "Task")
-                        .WithMany()
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Distributor");
-
-                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("CDE_Web_API.Models.PermissionModule", b =>
                 {
                     b.Navigation("Permissions");
+                });
+
+            modelBuilder.Entity("CDE_Web_API.Models.PositionGroup", b =>
+                {
+                    b.Navigation("PositionTitiles");
                 });
 #pragma warning restore 612, 618
         }

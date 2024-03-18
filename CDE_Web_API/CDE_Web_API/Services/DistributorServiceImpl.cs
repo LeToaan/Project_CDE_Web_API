@@ -50,28 +50,79 @@ public class DistributorServiceImpl : DistributorService
             Thread thread = Thread.CurrentThread;
 
             var distributorExit = _dbContext.Distributors.FirstOrDefault(a => a.Email == distributor.Email);
-            if (distributorExit != null)
+            var account_ = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == distributor.Email);
+            if (distributorExit != null && account_ != null)
             {
-                return new BadRequestObjectResult(new { msg = "Area already exists!" });
+                return new BadRequestObjectResult(new { msg = "Distributor already exists!" });
             }
 
-
+            distributor.PositionGroupId = 3;
 
             _dbContext.Distributors.Add(distributor);
             if (await _dbContext.SaveChangesAsync() > 0)
             {
-                var area = _dbContext.Areas.FirstOrDefault(a => a.Id == distributor.AreaId);
+                //var area = _dbContext.Areas.FirstOrDefault(a => a.Id == 1);
                 Account account = new Account();
                 account.Password = "123456";
                 account.Fullname = distributor.Name;
                 account.Email = distributor.Email;
                 account.Phone = distributor.Phone;
-                account.Address = area.AreaName;
-                account.Status = true;
+                account.Address = distributor.Address;
+                account.Status = distributor.Status;
                 account.Created = DateTime.Now;
-                account.AreaId = distributor.AreaId;
-                account.PositionGroupId = distributor.PositionGroupId;
+                // account.AreaId = 1;
+                account.PositionGroupId = 3;
+                var positionTitle = await _dbContext.PositionTitles.FirstOrDefaultAsync(
+                    p => p.PositionGroupId == account.PositionGroupId);
+                account.PositionTitleId = positionTitle.Id;
                 _dbContext.Accounts.Add(account);
+                await _dbContext.SaveChangesAsync();
+                return new OkObjectResult(new { result = true });
+            }
+            else
+            {
+                return new OkObjectResult(new { result = false });
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            return new BadRequestObjectResult(new { msg = ex.Message });
+        }
+    }
+
+    public async Task<IActionResult> update_distriburot(DistributorUpdateDTO distributorDTO, int id)
+    {
+
+        Distributor distributor = _mapper.Map<Distributor>(distributorDTO);
+        try
+        {
+            var distributor_find = _dbContext.Distributors.FirstOrDefault(d => d.Id == id);
+            var distributorExit = _dbContext.Distributors.FirstOrDefault(a => a.Email == distributor.Email);
+            var account = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == distributor_find.Email);
+            if (distributorExit != null && account != null)
+            {
+                return new BadRequestObjectResult(new { msg = "Distributor already exists or Invalid!" });
+            }
+
+            distributor_find.Name = distributor.Name;
+            distributor_find.Email = distributor.Email;
+            distributor_find.Phone = distributor.Phone;
+            distributor_find.SaleManagement = distributor.SaleManagement;
+            distributor_find.Sales = distributor.Sales;
+            distributor_find.Status = distributor.Status;
+
+            _dbContext.Entry(distributor_find).State = EntityState.Modified;
+            if (await _dbContext.SaveChangesAsync() > 0)
+            {
+                //var area = _dbContext.Areas.FirstOrDefault(a => a.Id == 1);
+                account.Fullname = distributor_find.Name;
+                account.Email = distributor_find.Email;
+                account.Phone = distributor_find.Phone;
+                account.Status = distributor.Status;
+
+                _dbContext.Entry(account).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
                 return new OkObjectResult(new { result = true });
             }

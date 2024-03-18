@@ -12,6 +12,8 @@ public class PositionTitle
     [MaxLength(250)]
     public string Name { get; set; }
 
+    public DateTime? created { get; set; }
+
     public string? PermissionIds { get; set; }
     public int PositionGroupId { get; set; }
     public virtual PositionGroup? PositionGroup { get; set; }

@@ -32,4 +32,16 @@ public class DistributorController : Controller
         }
         return await distributorService.creater_distriburot(distributorDTO);
     }
+
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [HttpPut("update_distributor/{id}"), Authorize(Roles = "System,Distributor")]
+    public async Task<IActionResult> update_distributor([FromBody] DistributorUpdateDTO distributorDTO, int id)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return await distributorService.update_distriburot(distributorDTO, id);
+    }
 }

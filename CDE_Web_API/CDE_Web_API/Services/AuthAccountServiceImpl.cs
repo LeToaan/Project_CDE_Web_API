@@ -46,6 +46,8 @@ public class AuthAccountServiceImpl : AuthAccountService
     {
         try
         {
+
+            Account account = _mapper.Map<Account>(accountDTO);
             var modelState = _httpContextAccessor.HttpContext?.Items["MS_ModelState"] as ModelStateDictionary;
                 if (modelState != null && !modelState.IsValid)
                 {
@@ -53,9 +55,9 @@ public class AuthAccountServiceImpl : AuthAccountService
                 }
                 else
                 {
-                var user = await _dbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(x => x.Email == accountDTO.Email);
+                Account user =  _dbContext.Accounts.FirstOrDefault(x => x.Email == account.Email);
 
-                if(user.Email != accountDTO.Email || user.Password != accountDTO.Password) 
+                if(user.Email != account.Email || user.Password != account.Password) 
                 {
                     return new BadRequestObjectResult(modelState);
                 }

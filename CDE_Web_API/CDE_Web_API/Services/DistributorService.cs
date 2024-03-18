@@ -6,5 +6,5 @@ namespace CDE_Web_API.Services;
 public interface DistributorService
 {
     public Task<IActionResult> creater_distriburot(DistributorDTO distributorDTO);
-
+    public Task<IActionResult> update_distriburot(DistributorUpdateDTO distributorDTO, int id);
 }
