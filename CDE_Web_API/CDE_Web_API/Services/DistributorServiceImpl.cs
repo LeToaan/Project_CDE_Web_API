@@ -75,6 +75,7 @@ public class DistributorServiceImpl : DistributorService
                 var positionTitle = await _dbContext.PositionTitles.FirstOrDefaultAsync(
                     p => p.PositionGroupId == account.PositionGroupId);
                 account.PositionTitleId = positionTitle.Id;
+                account.DistributorId = distributor.Id;
                 _dbContext.Accounts.Add(account);
                 await _dbContext.SaveChangesAsync();
                 return new OkObjectResult(new { result = true });
@@ -120,7 +121,7 @@ public class DistributorServiceImpl : DistributorService
                 account.Fullname = distributor_find.Name;
                 account.Email = distributor_find.Email;
                 account.Phone = distributor_find.Phone;
-                account.Status = distributor.Status;
+                account.Status = distributor_find.Status;
 
                 _dbContext.Entry(account).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();

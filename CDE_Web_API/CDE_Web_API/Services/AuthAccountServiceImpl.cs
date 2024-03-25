@@ -107,4 +107,98 @@ public class AuthAccountServiceImpl : AuthAccountService
         }
         return result;
     }
+
+    public dynamic getAccountSystems()
+    {
+        var systems = _dbContext.Accounts.Where(s => s.PositionGroupId == 1).Select(account => new
+        {
+            id = account.Id,
+            fullname = account.Fullname,
+            email = account.Email,
+            phone = account.Phone,
+            status = account.Status,
+            positionGroupId = account.PositionGroupId,
+            positionTitleId = account.PositionTitleId,
+            positionTitle = _dbContext.PositionTitles.Where(p => p.Id == account.PositionTitleId).Select(position => new
+            {
+                id = position.Id,
+                name = position.Name,
+            }
+                ).FirstOrDefault()
+        }).ToList();
+        return systems;
+    }
+
+    public dynamic getAccountSales()
+    {
+        var sales = _dbContext.Accounts.Where(s => s.PositionGroupId == 2).Select(account => new
+        {
+            id = account.Id,
+            fullname = account.Fullname,
+            email = account.Email,
+            phone = account.Phone,
+            status = account.Status,
+            positionGroupId = account.PositionGroupId,
+            positionTitleId = account.PositionTitleId,
+            positionTitle = _dbContext.PositionTitles.Where(p => p.Id == account.PositionTitleId).Select(position => new
+            {
+                id = position.Id,
+                name = position.Name,
+            }
+                ).FirstOrDefault()
+        }).ToList();
+        return sales;
+    }
+
+    public dynamic getAccountDistributor()
+    {
+        var distributor = _dbContext.Distributors.Where(s => s.PositionGroupId == 3).Select(distributor_ => new
+        {
+            id = distributor_.Id,
+            name = distributor_.Name,
+           
+            email = distributor_.Email,
+            phone = distributor_.Phone,
+            status = distributor_.Status,
+            positionGroupId = distributor_.PositionGroupId,
+            saleManagement = _dbContext.Accounts.Where(a => a.Id == distributor_.SaleManagement).Select(account => new
+            {
+                id = account.Id,
+                fullname = account.Fullname,
+                email = account.Email,
+                phone = account.Phone,
+                status = account.Status,
+                positionTitle = _dbContext.PositionTitles.Where(p => p.Id == account.PositionTitleId).Select(position => new
+                {
+                    id = position.Id,
+                    name = position.Name,
+                }
+               ).FirstOrDefault()
+
+            }).FirstOrDefault(),
+
+        }).ToList();
+        return distributor;
+    }
+
+    public dynamic getAccountGuest()
+    {
+        var guest = _dbContext.Accounts.Where(s => s.PositionGroupId == 4).Select(account => new
+        {
+            id = account.Id,
+            fullname = account.Fullname,
+            email = account.Email,
+            phone = account.Phone,
+            status = account.Status,
+            positionGroupId = account.PositionGroupId,
+            positionTitleId = account.PositionTitleId,
+            positionTitle = _dbContext.PositionTitles.Where(p => p.Id == account.PositionTitleId).Select(position => new
+            {
+                id = position.Id,
+                name = position.Name,
+            }
+                ).FirstOrDefault()
+        }).ToList();
+        return guest;
+    }
 }

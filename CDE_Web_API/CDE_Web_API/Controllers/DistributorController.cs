@@ -11,19 +11,30 @@ public class DistributorController : Controller
 {
     private DistributorService distributorService;
     private AuthAccountService authAccountService;
+    private PositionTitleService positionTitleService;
 
     public DistributorController(
         DistributorService _distributorService,
-        AuthAccountService _authAccountService
+        AuthAccountService _authAccountService,
+        PositionTitleService _positionTitleService
         )
     {
         distributorService = _distributorService;
         authAccountService = _authAccountService;
+        positionTitleService= _positionTitleService;
+    }
+
+    [Produces("application/json")]
+    [HttpGet("getPositionTitleDistributor")]
+    public ActionResult<dynamic> getPositionDistributor()
+    {
+
+        return Ok(positionTitleService.getPosition_Title_Distributor());
     }
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_distributor"), Authorize(Roles = "System,Distributor")]
+    [HttpPost("create_distributor"), Authorize(Roles = "System")]
     public async Task<IActionResult> create_distributor([FromBody] DistributorDTO distributorDTO)
     {
         if (!ModelState.IsValid)
@@ -35,7 +46,7 @@ public class DistributorController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update_distributor/{id}"), Authorize(Roles = "System,Distributor")]
+    [HttpPut("update_distributor/{id}"), Authorize(Roles = "System")]
     public async Task<IActionResult> update_distributor([FromBody] DistributorUpdateDTO distributorDTO, int id)
     {
         if (!ModelState.IsValid)

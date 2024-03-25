@@ -74,9 +74,33 @@ public class PositionTitleServiceImpl : PositionTitleService
         
     }
 
-    public async Task<IActionResult> getPosition_Title_user()
+    public dynamic getPosition_Title_user()
     {
-        var position = await _dbContext.PositionTitles.FirstOrDefaultAsync(p => p.PositionGroupId == 4);
-        return new OkObjectResult(position);
+        var position = _dbContext.PositionTitles.Where(p => p.PositionGroupId == 4).Select(position => new
+        {
+            id = position.Id,
+            name = position.Name,
+        }).ToList();
+        return position;
+    }
+
+    public dynamic getPosition_Title_Sales()
+    {
+        var position = _dbContext.PositionTitles.Where(p => p.PositionGroupId == 2).Select(position => new
+        {
+            id = position.Id,
+            name = position.Name,
+        }).ToList();
+        return position;
+    }
+
+    public dynamic getPosition_Title_Distributor()
+    {
+        var position = _dbContext.PositionTitles.Where(p => p.PositionGroupId == 3).Select(position => new
+        {
+            id = position.Id,
+            name = position.Name,
+        }).ToList();
+        return position;
     }
 }

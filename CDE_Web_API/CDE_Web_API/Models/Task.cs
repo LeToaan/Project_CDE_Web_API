@@ -20,8 +20,10 @@ public class Task
 
     public short? Status { get; set; }
 
+    [DisplayFormat(DataFormatString = "{yyyy-MM-dd}")]
     public DateTime? DateStart { get; set; }
 
+    [DisplayFormat(DataFormatString = "{yyyy-MM-dd}")]
     public DateTime? DateEnd { get; set; }
 
     [Required]

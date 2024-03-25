@@ -25,11 +25,51 @@ public class AccountController : ControllerBase
     }
 
     [Produces("application/json")]
+    [HttpGet("getAccountSystem")]
+    public ActionResult<dynamic> getAccountSystem()
+    {
+        
+        return Ok(authAccountService.getAccountSystems());
+    }
+
+    [Produces("application/json")]
+    [HttpGet("getAccountSales")]
+    public ActionResult<dynamic> getAccountSales()
+    {
+
+        return Ok(authAccountService.getAccountSales());
+    }
+
+    [Produces("application/json")]
+    [HttpGet("getAccountDistributor")]
+    public ActionResult<dynamic> getAccountDistributor()
+    {
+
+        return Ok(authAccountService.getAccountDistributor());
+    }
+
+    [Produces("application/json")]
+    [HttpGet("getAccountGuest")]
+    public ActionResult<dynamic> getAccountGuest()
+    {
+
+        return Ok(authAccountService.getAccountGuest());
+    }
+
+    [Produces("application/json")]
     [Consumes("application/json")]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] AccountLoginDTO accountDTO)
     {
         return await authAccountService.Login(accountDTO);
+    }
+
+    [Produces("application/json")]
+    [HttpGet("getPositionTitleUser")]
+    public ActionResult<dynamic> getPositionUser()
+    {
+
+        return Ok(positionTitleService.getPosition_Title_user());
     }
 
     [Produces("application/json")]
@@ -57,6 +97,13 @@ public class AccountController : ControllerBase
     }
 
     [Produces("application/json")]
+    [HttpGet("getPositionTitleSales")]
+    public ActionResult<dynamic> getPositionSales()
+    {
+
+        return Ok(positionTitleService.getPosition_Title_Sales());
+    }
+    [Produces("application/json")]
     [Consumes("application/json")]
     [HttpPost("create_sales"), Authorize(Roles = "System")]
     public async Task<IActionResult> create_sales([FromBody] AccountSalesDTO accountSalesDTO)
@@ -70,7 +117,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update_sales/{id}"), Authorize(Roles = "System ,Sales")]
+    [HttpPut("update_sales/{id}"), Authorize(Roles = "System")]
     public async Task<IActionResult> update_sales([FromBody] AccountSalesUpdateDTO accountSalesDTO, int id)
     {
         if (!ModelState.IsValid)

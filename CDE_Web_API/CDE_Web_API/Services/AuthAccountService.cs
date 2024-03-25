@@ -9,4 +9,9 @@ public interface AuthAccountService
     public Task<IActionResult> register(AccountDTO accountDTO);
     public Task<IActionResult> Login(AccountLoginDTO accountDTO);
     public string getAccount();
+    public dynamic getAccountSystems();
+    public dynamic getAccountSales();
+    public dynamic getAccountDistributor();
+    public dynamic getAccountGuest();
+
 }

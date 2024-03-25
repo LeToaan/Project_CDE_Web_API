@@ -11,6 +11,7 @@ public class Visit
 
     public short? Time { get; set; }
 
+    [DisplayFormat(DataFormatString = "{yyyy-MM-dd}")]
     public DateTime? DateTime { get; set; }
 
     [MaxLength(250)]

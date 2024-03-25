@@ -66,11 +66,14 @@ public class AutoMapperProfile : Profile
         CreateMap<SurveyRequest, SurveyRequestDTO>();
 
         CreateMap<Task, TaskDTO>();
+        CreateMap<TaskDTO, Task>();
 
         CreateMap<Tokent, TokentDTO>();
 
         CreateMap<UserList, UserListDTO>();
 
         CreateMap<Visit, VisitDTO>();
+        CreateMap<VisitDTO, Visit>();
+
     }
 }
