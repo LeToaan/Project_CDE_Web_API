@@ -50,6 +50,7 @@ builder.Services.AddScoped<DistributorService, DistributorServiceImpl>();
 builder.Services.AddScoped<PositionTitleService, PositionTitleServiceImpl>();
 builder.Services.AddScoped<VisitService, VisitServiceImpl>();
 builder.Services.AddScoped<TaskService, TaskServiceImpl>();
+builder.Services.AddScoped<AccountAccessorService, AccountAccessorServiceImpl>();
 
 builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();

@@ -51,7 +51,7 @@ public class DistributorServiceImpl : DistributorService
 
             var distributorExit = _dbContext.Distributors.FirstOrDefault(a => a.Email == distributor.Email);
             var account_ = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == distributor.Email);
-            if (distributorExit != null && account_ != null)
+            if (distributorExit != null || account_ != null)
             {
                 return new BadRequestObjectResult(new { msg = "Distributor already exists!" });
             }
@@ -63,7 +63,9 @@ public class DistributorServiceImpl : DistributorService
             {
                 //var area = _dbContext.Areas.FirstOrDefault(a => a.Id == 1);
                 Account account = new Account();
-                account.Password = "123456";
+                var password = GenaratePassword.CreatePassword(6);
+                var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
+                account.Password = hashPassword;
                 account.Fullname = distributor.Name;
                 account.Email = distributor.Email;
                 account.Phone = distributor.Phone;
@@ -77,7 +79,20 @@ public class DistributorServiceImpl : DistributorService
                 account.PositionTitleId = positionTitle.Id;
                 account.DistributorId = distributor.Id;
                 _dbContext.Accounts.Add(account);
-                await _dbContext.SaveChangesAsync();
+
+                var tokentVerify = new Tokent();
+                tokentVerify.VerificationToken = ContenMailHelper.CreateRandomToken();
+                tokentVerify.VerifiedAt = DateTime.Now;
+                _dbContext.Tokents.Add(tokentVerify);
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    account.TokentId = tokentVerify.Id;
+                    _dbContext.Entry(account).State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+                }
+                var mailHelper = new MailHelper(_configuration);
+                mailHelper.Send(_configuration["Gmail:Username"], account.Email,
+                "Information Your Account", ContenMailHelper.content(password));
                 return new OkObjectResult(new { result = true });
             }
             else
@@ -100,39 +115,43 @@ public class DistributorServiceImpl : DistributorService
         try
         {
             var distributor_find = _dbContext.Distributors.FirstOrDefault(d => d.Id == id);
-            var distributorExit = _dbContext.Distributors.FirstOrDefault(a => a.Email == distributor.Email);
-            var account = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == distributor_find.Email);
-            if (distributorExit != null && account != null)
+            if (distributor_find == null || distributor_find.PositionGroup.Name != "Distributor")
             {
-                return new BadRequestObjectResult(new { msg = "Distributor already exists or Invalid!" });
-            }
-
-            distributor_find.Name = distributor.Name;
-            distributor_find.Email = distributor.Email;
-            distributor_find.Phone = distributor.Phone;
-            distributor_find.SaleManagement = distributor.SaleManagement;
-            distributor_find.Sales = distributor.Sales;
-            distributor_find.Status = distributor.Status;
-
-            _dbContext.Entry(distributor_find).State = EntityState.Modified;
-            if (await _dbContext.SaveChangesAsync() > 0)
+                return new BadRequestObjectResult(new { msg = "Distributor not exists or Invalid!" });
+            }else
             {
-                //var area = _dbContext.Areas.FirstOrDefault(a => a.Id == 1);
-                account.Fullname = distributor_find.Name;
-                account.Email = distributor_find.Email;
-                account.Phone = distributor_find.Phone;
-                account.Status = distributor_find.Status;
+                var distributorExit = _dbContext.Distributors.FirstOrDefault(a => a.Email == distributor.Email);
+                var account = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == distributor_find.Email);
+                if ((distributorExit != null && distributor_find.Email != distributor.Email) || (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == distributor.Email) != null && distributor_find.Email != distributor.Email))
+                {
+                    return new BadRequestObjectResult(new { msg = "Distributor already exists or Invalid!" });
+                }
 
-                _dbContext.Entry(account).State = EntityState.Modified;
-                await _dbContext.SaveChangesAsync();
-                return new OkObjectResult(new { result = true });
+                distributor_find.Name = distributor.Name;
+                distributor_find.Email = distributor.Email;
+                distributor_find.Phone = distributor.Phone;
+                distributor_find.SaleManagement = distributor.SaleManagement;
+                distributor_find.Sales = distributor.Sales;
+                distributor_find.Status = distributor.Status;
+
+                _dbContext.Entry(distributor_find).State = EntityState.Modified;
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    //var area = _dbContext.Areas.FirstOrDefault(a => a.Id == 1);
+                    account.Fullname = distributor_find.Name;
+                    account.Email = distributor_find.Email;
+                    account.Phone = distributor_find.Phone;
+                    account.Status = distributor_find.Status;
+
+                    _dbContext.Entry(account).State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+                    return new OkObjectResult(new { result = true });
+                }
+                else
+                {
+                    return new OkObjectResult(new { result = false });
+                }
             }
-            else
-            {
-                return new OkObjectResult(new { result = false });
-            }
-
-
         }
         catch (Exception ex)
         {

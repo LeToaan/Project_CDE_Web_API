@@ -10,7 +10,7 @@ public class AccountDTO
     // public string Password { get; set; }
     [Required]
     public string Fullname { get; set; }
-    [Required]
+    [Required, EmailAddress]
     public string Email { get; set; }
 
     //public string? Phone { get; set; }

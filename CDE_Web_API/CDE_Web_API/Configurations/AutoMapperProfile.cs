@@ -27,8 +27,8 @@ public class AutoMapperProfile : Profile
         CreateMap<Account, AccountLoginDTO>();
         CreateMap<AccountLoginDTO, Account>();
 
-        CreateMap<Account, AccountTokentDTO>();
-        CreateMap<AccountTokentDTO, Account>();
+        CreateMap<Account, ResetPasswordDTO>();
+        CreateMap<ResetPasswordDTO, Account>();
 
         CreateMap<Answer, AnswerDTO>();
 

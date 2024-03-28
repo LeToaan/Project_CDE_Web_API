@@ -74,7 +74,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_user"), Authorize(Roles = "System ,Sales")]
+    [HttpPost("create-user"), Authorize(Roles = "System ,Sales")]
     public async Task<IActionResult> create_user([FromBody] AccountDTO accountDTO)
     {
         if (!ModelState.IsValid)
@@ -86,7 +86,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update_user/{id}"), Authorize(Roles = "System ,Sales")]
+    [HttpPut("update-user/{id}"), Authorize(Roles = "System ,Sales")]
     public async Task<IActionResult> update_user([FromBody] AccountDTO accountDTO, int id)
     {
         if (!ModelState.IsValid)
@@ -103,9 +103,10 @@ public class AccountController : ControllerBase
 
         return Ok(positionTitleService.getPosition_Title_Sales());
     }
+
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_sales"), Authorize(Roles = "System")]
+    [HttpPost("create-sales"), Authorize(Roles = "System")]
     public async Task<IActionResult> create_sales([FromBody] AccountSalesDTO accountSalesDTO)
     {
         if (!ModelState.IsValid)
@@ -117,7 +118,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update_sales/{id}"), Authorize(Roles = "System")]
+    [HttpPut("update-sales/{id}"), Authorize(Roles = "System")]
     public async Task<IActionResult> update_sales([FromBody] AccountSalesUpdateDTO accountSalesDTO, int id)
     {
         if (!ModelState.IsValid)
@@ -125,5 +126,25 @@ public class AccountController : ControllerBase
             return BadRequest(ModelState);
         }
         return await accountService.update_sales(accountSalesDTO, id);
+    }
+
+    [Produces("application/json")]
+    [HttpGet("forget-password/{email}")]
+    public async Task<IActionResult> forgetPassword(string email)
+    {
+        
+        return await accountService.forget_password(email);
+    }
+
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [HttpPut("reset-password/{code}")]
+    public async Task<IActionResult> resetPassword(string code ,[FromBody] ResetPasswordDTO resetPasswordDTO)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return await accountService.reset_password(code ,resetPasswordDTO);
     }
 }

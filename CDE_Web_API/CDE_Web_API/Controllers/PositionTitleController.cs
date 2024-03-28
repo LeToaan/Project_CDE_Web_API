@@ -23,7 +23,7 @@ public class PositionTitleController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_positionTitle"), Authorize(Roles = "System")]
+    [HttpPost("create_positionTitle")]
     public async Task<IActionResult> create_positionTitle([FromBody] PositionTitleDTO positionTitleDTO)
     {
         if (!ModelState.IsValid)

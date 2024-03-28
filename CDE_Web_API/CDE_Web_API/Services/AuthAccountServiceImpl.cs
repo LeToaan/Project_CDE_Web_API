@@ -57,15 +57,23 @@ public class AuthAccountServiceImpl : AuthAccountService
                 {
                 Account user =  _dbContext.Accounts.FirstOrDefault(x => x.Email == account.Email);
 
-                if(user.Email != account.Email || user.Password != account.Password) 
+                if(user != null) 
                 {
-                    return new BadRequestObjectResult(modelState);
+                    if (BCrypt.Net.BCrypt.Verify(account.Password, user.Password))
+                    {
+                        var positionGroup = await _dbContext.PositionGroups.AsNoTracking().FirstOrDefaultAsync(p => p.Id == user.PositionGroupId);
+                        string tokent = CreateTokent(user.Email, positionGroup.Name);
+                        return new OkObjectResult(tokent);
+                    }else
+                    {
+                        return new BadRequestObjectResult(new {msg = "Password is correct!"});
+                    }
+                    
                 }
                 else
                 {
-                    var positionGroup = await _dbContext.PositionGroups.AsNoTracking().FirstOrDefaultAsync(p => p.Id == user.PositionGroupId);
-                    string tokent = CreateTokent(user.Email, positionGroup.Name);
-                    return new OkObjectResult(tokent);
+                 return new BadRequestObjectResult(new { msg = "Email or Password is correct!" });
+                    
                 }
             }
 

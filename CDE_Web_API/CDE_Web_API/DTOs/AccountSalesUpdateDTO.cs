@@ -6,7 +6,7 @@ public class AccountSalesUpdateDTO
 {
     [Required]
     public string Fullname { get; set; }
-    [Required]
+    [Required, EmailAddress]
     public string Email { get; set; }
     [Required]
     public int PositionTitleId { get; set; }

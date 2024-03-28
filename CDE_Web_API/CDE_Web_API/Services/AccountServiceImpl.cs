@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
+using System.Configuration;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Web.Http.ModelBinding;
 using System.Xml.Linq;
@@ -26,6 +28,7 @@ public class AccountServiceImpl : AccountService
     private IConfiguration _configuration;
     private IHttpContextAccessor _httpContextAccessor;
     private AuthAccountService _authAccountService;
+
 
     public AccountServiceImpl(
         IConfiguration configuration, 
@@ -66,14 +69,30 @@ public class AccountServiceImpl : AccountService
             {
                 user.PositionGroupId = 4;
             }
-                user.Password = "0123456";
+                var password = GenaratePassword.CreatePassword(6);
+                var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
+                user.Password = hashPassword;
                 user.Status = true;
                 user.Created = DateTime.Now;
 
-                _dbContext.Accounts.Add(user);
+                
+                 _dbContext.Accounts.Add(user);
                 if(await _dbContext.SaveChangesAsync() > 0)
                 {
-                    return new OkObjectResult(new { result = true});
+                    var tokentVerify = new Tokent();
+                    tokentVerify.VerificationToken = ContenMailHelper.CreateRandomToken();
+                    tokentVerify.VerifiedAt = DateTime.Now;
+                    _dbContext.Tokents.Add(tokentVerify);
+                        if(await _dbContext.SaveChangesAsync() > 0)
+                    {
+                    user.TokentId = tokentVerify.Id;
+                    _dbContext.Entry(user).State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+                    }
+                    var mailHelper = new MailHelper(_configuration);
+                    mailHelper.Send(_configuration["Gmail:Username"], user.Email,
+                    "Information Your Account", ContenMailHelper.content(password));
+                return new OkObjectResult(new { result = true});
                 }else
                 {
                     return new OkObjectResult(new { result = false});
@@ -159,11 +178,26 @@ public class AccountServiceImpl : AccountService
                 user.PositionGroupId = position.PositionGroupId;
 
             }
-            user.Password = "0123456";
+            var password = GenaratePassword.CreatePassword(6);
+            var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
+            user.Password = hashPassword;
             user.Created = DateTime.Now;
             _dbContext.Accounts.Add(user);
             if (await _dbContext.SaveChangesAsync() > 0)
             {
+                var tokentVerify = new Tokent();
+                tokentVerify.VerificationToken = ContenMailHelper.CreateRandomToken();
+                tokentVerify.VerifiedAt = DateTime.Now;
+                _dbContext.Tokents.Add(tokentVerify);
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    user.TokentId = tokentVerify.Id;
+                    _dbContext.Entry(user).State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+                }
+                var mailHelper = new MailHelper(_configuration);
+                mailHelper.Send(_configuration["Gmail:Username"], user.Email,
+                "Information Your Account", ContenMailHelper.content(password));
                 return new OkObjectResult(new { result = true });
             }
             else
@@ -235,5 +269,68 @@ public class AccountServiceImpl : AccountService
         {
             return new BadRequestObjectResult(new { msg = ex.Message });
         }
+    }
+
+    public async Task<IActionResult> forget_password(string email)
+    {
+        var user = await _dbContext.Accounts.FirstOrDefaultAsync(u => u.Email == email);
+        if(user == null)
+        {
+            return new BadRequestObjectResult(new { msg = "User not found!" });
+        }else
+        {
+                var tokent = await _dbContext.Tokents.FirstOrDefaultAsync(t => t.Id == user.TokentId);
+                tokent.PasswordResetToken = GenaratePassword.CreatePassword(6);
+                tokent.ResetTokenExpires = DateTime.Now.AddMinutes(30);
+                _dbContext.Entry(tokent).State = EntityState.Modified;
+            if (await _dbContext.SaveChangesAsync() > 0)
+            {
+                var mailHelper = new MailHelper(_configuration);
+                mailHelper.Send(_configuration["Gmail:Username"], user.Email,
+                "Code Reset Password", ContenMailHelper.content(tokent.PasswordResetToken));
+                return new OkObjectResult(new { msg = "Check your mail to take code!" });
+            }else
+            {
+                return new BadRequestObjectResult(new { msg = "Failed!!" });
+            }
+                
+                
+        }
+    }
+
+    
+
+    
+
+    public async Task<IActionResult> reset_password(string code,ResetPasswordDTO resetPasswordDTO)
+    {
+        try
+        {
+            var tokent = await _dbContext.Tokents.FirstOrDefaultAsync(t => t.PasswordResetToken == code);
+            var user = await _dbContext.Accounts.FirstOrDefaultAsync(u => u.TokentId == tokent.Id);
+            if (tokent == null || tokent.ResetTokenExpires < DateTime.Now)
+            {
+                return new BadRequestObjectResult(new { msg = "Code Invalid or Expired!" });
+            }
+
+
+            var hashPassword = BCrypt.Net.BCrypt.HashPassword(resetPasswordDTO.Password);
+            user.Password = hashPassword;
+            _dbContext.Entry(user).State = EntityState.Modified;
+            tokent.PasswordResetToken = null;
+            tokent.ResetTokenExpires = null;
+            _dbContext.Entry(user).State = EntityState.Modified;
+            if (await _dbContext.SaveChangesAsync() > 0)
+            {
+                return new OkObjectResult(new { msg = "Reset password success!" });
+            }else
+            {
+                return new BadRequestObjectResult(new { msg = "Reset password failed!!" });
+            }
+        }catch (Exception e)
+        {
+            return new BadRequestObjectResult(new { msg = e.Message });
+        }
+        
     }
 }
