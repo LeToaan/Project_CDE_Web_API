@@ -77,10 +77,7 @@ public class AccountController : ControllerBase
     [HttpPost("create-user"), Authorize(Roles = "System ,Sales")]
     public async Task<IActionResult> create_user([FromBody] AccountDTO accountDTO)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
+       
         return await accountService.register(accountDTO);
     }
 
@@ -89,11 +86,17 @@ public class AccountController : ControllerBase
     [HttpPut("update-user/{id}"), Authorize(Roles = "System ,Sales")]
     public async Task<IActionResult> update_user([FromBody] AccountDTO accountDTO, int id)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
+        
         return await accountService.update_user(accountDTO, id);
+    }
+
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [HttpPut("delete-user/{id}"), Authorize(Roles = "System ,Sales")]
+    public async Task<IActionResult> delete_user(int id)
+    {
+       
+        return await accountService.delete_user(id);
     }
 
     [Produces("application/json")]

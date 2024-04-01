@@ -34,7 +34,7 @@ public class DistributorController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_distributor"), Authorize(Roles = "System")]
+    [HttpPost("create_distributor"), Authorize(Roles = "System, Create new distributor")]
     public async Task<IActionResult> create_distributor([FromBody] DistributorDTO distributorDTO)
     {
         if (!ModelState.IsValid)
@@ -46,7 +46,7 @@ public class DistributorController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update_distributor/{id}"), Authorize(Roles = "System")]
+    [HttpPut("update_distributor/{id}"), Authorize(Roles = "System, Update detail distributor")]
     public async Task<IActionResult> update_distributor([FromBody] DistributorUpdateDTO distributorDTO, int id)
     {
         if (!ModelState.IsValid)

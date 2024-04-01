@@ -39,7 +39,7 @@ public class Account
 
     public string? Inferior { get; set; }
 
-    public string? SecurityCode { get; set; }
+    public string? PermissionId { get; set; }
     public int? PositionTitleId { get; set; }
     public int? DistributorId { get; set; }
 
@@ -52,6 +52,5 @@ public class Account
     public int? TokentId { get; set; }
     public virtual Tokent? Tokent { get; set; }
 
-    
-
+    public Dictionary<int, Permission> Permissions = new Dictionary<int, Permission>();
 }

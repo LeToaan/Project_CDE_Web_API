@@ -78,7 +78,7 @@ namespace CDE_Web_API.Migrations
                     b.Property<int?>("PositionTitleId")
                         .HasColumnType("int");
 
-                    b.Property<string>("SecurityCode")
+                    b.Property<string>("PermissionId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("Status")

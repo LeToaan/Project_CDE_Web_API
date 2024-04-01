@@ -114,7 +114,7 @@ public class DistributorServiceImpl : DistributorService
         Distributor distributor = _mapper.Map<Distributor>(distributorDTO);
         try
         {
-            var distributor_find = _dbContext.Distributors.FirstOrDefault(d => d.Id == id);
+            var distributor_find = await _dbContext.Distributors.FirstOrDefaultAsync(d => d.Id == id);
             if (distributor_find == null || distributor_find.PositionGroup.Name != "Distributor")
             {
                 return new BadRequestObjectResult(new { msg = "Distributor not exists or Invalid!" });

@@ -333,4 +333,24 @@ public class AccountServiceImpl : AccountService
         }
         
     }
+
+    public async Task<IActionResult> delete_user(int id)
+    {
+        try
+        {
+            var id_user = await _dbContext.Accounts.FindAsync(id);
+            if (id_user == null)
+            {
+                return new BadRequestObjectResult(new { msg = "User not found!" });
+            }
+            _dbContext.Accounts.Remove(id_user);
+            if(await _dbContext.SaveChangesAsync() > 0)
+            {
+                return new OkObjectResult(new { msg = "Delete success!" });
+            }else { return new BadRequestObjectResult(new { msg = "Delete failed!" }); }
+        }catch(Exception e)
+        {
+            return new BadRequestObjectResult(new {msg = e.Message});
+        }
+    }
 }

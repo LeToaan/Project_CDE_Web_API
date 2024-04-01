@@ -208,7 +208,7 @@ namespace CDE_Web_API.Migrations
                     Created = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Superior = table.Column<int>(type: "int", nullable: true),
                     Inferior = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PermissionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PositionTitleId = table.Column<int>(type: "int", nullable: true),
                     DistributorId = table.Column<int>(type: "int", nullable: true),
                     AreaId = table.Column<int>(type: "int", nullable: true),

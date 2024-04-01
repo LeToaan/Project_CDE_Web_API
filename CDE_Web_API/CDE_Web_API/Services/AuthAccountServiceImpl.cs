@@ -62,7 +62,7 @@ public class AuthAccountServiceImpl : AuthAccountService
                     if (BCrypt.Net.BCrypt.Verify(account.Password, user.Password))
                     {
                         var positionGroup = await _dbContext.PositionGroups.AsNoTracking().FirstOrDefaultAsync(p => p.Id == user.PositionGroupId);
-                        string tokent = CreateTokent(user.Email, positionGroup.Name);
+                        string tokent = CreateTokent(user.Email, positionGroup.Name, user.PermissionId);
                         return new OkObjectResult(tokent);
                     }else
                     {
@@ -84,12 +84,30 @@ public class AuthAccountServiceImpl : AuthAccountService
             }
     }
 
-    private string CreateTokent(string email, string positionGroup)
+    private string CreateTokent(string email, string positionGroup, string permission)
     {
+            string numbersString = permission.Replace("[", "").Replace("]", "");
+
+            // Tách chuỗi thành các chuỗi con dựa trên dấu phẩy
+            string[] numberStrings = numbersString.Split(',');
+
+            // Chuyển đổi mỗi chuỗi con thành một số nguyên
+            int[] numbers = numberStrings.Select(s => int.Parse(s.Trim())).ToArray();
+
+            // In ra từng giá trị
+            
         List<Claim> claims = new List<Claim> {
             new Claim(ClaimTypes.Name, email),
             new Claim(ClaimTypes.Role, positionGroup),
+           
         };
+
+
+        foreach (int number in numbers)
+        {
+            var permission_find = _dbContext.Permissions.FirstOrDefault(p => p.Id == number);
+            claims.Add(new Claim(ClaimTypes.Role, permission_find.Name));
+        }
 
         var authKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JWT:Secret").Value));
         var creds = new SigningCredentials(authKey, SecurityAlgorithms.HmacSha512Signature);

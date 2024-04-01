@@ -54,6 +54,9 @@ public class AutoMapperProfile : Profile
 
         CreateMap<Permission, PermissionDTO>();
 
+        CreateMap<Account, PermissionAccountDTO>();
+        CreateMap<PermissionAccountDTO, Account>();
+
         CreateMap<PositionGroup, PositionGroupDTO>();
 
         CreateMap<PositionTitle, PositionTitleDTO>();
