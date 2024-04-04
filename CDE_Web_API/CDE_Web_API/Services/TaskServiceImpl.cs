@@ -57,10 +57,10 @@ public class TaskServiceImpl : TaskService
 
             var report = await _dbContext.Accounts.FirstOrDefaultAsync(s => s.Id == task.Report);
             var implement = await _dbContext.Accounts.FirstOrDefaultAsync(i => i.Id== task.Implement);
-            if(report.PositionGroupId != 2 || implement.PositionGroupId != 2 || report.PositionGroupId == 3 || implement.PositionGroupId == 3)
+          /*  if(report.PositionGroupId != 2 || implement.PositionGroupId != 2 || report.PositionGroupId == 3 || implement.PositionGroupId == 3)
             {
                 return new BadRequestObjectResult(new { msg = "Report and Implement just position sales!" });
-            }
+            }*/
 
             task.Status = 1;
             task.VisitId = id;

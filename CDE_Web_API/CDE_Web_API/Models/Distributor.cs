@@ -12,25 +12,21 @@ public class Distributor
     [MaxLength(250)]
     public string Name { get; set; }
 
-    [MaxLength(250)]
     public int SaleManagement { get; set; }
 
-    [MaxLength(250)]
-    public string Sales { get; set; }
+    public string? Sales { get; set; }
 
     [MaxLength(250)]
     public string Email { get; set; }
 
     [MaxLength(250)]
-    public string Phone { get; set; }
+    public string? Phone { get; set; }
 
     [Required]
     public string Address { get; set; }
 
     [Required]
     public bool Status { get; set; }
-
-    [Required]
-    public int PositionGroupId { get; set; }
-    public virtual PositionGroup PositionGroup { get; set; }
+    public int AccountId { get; set; }
+    public virtual Account Account { get; set; }
 }

@@ -50,6 +50,12 @@ public class CDEDbContext : DbContext
             .HasForeignKey(t => t.Id)
             .OnDelete(DeleteBehavior.NoAction);
 
+        modelBuilder.Entity<Rate>()
+            .HasOne<Task>(t => t.Task)
+            .WithMany()
+            .HasForeignKey(t => t.Id)
+            .OnDelete(DeleteBehavior.NoAction);
+
         base.OnModelCreating(modelBuilder);
     }
 }

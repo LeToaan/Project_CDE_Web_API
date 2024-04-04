@@ -23,7 +23,7 @@ public class AreaController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_area"), Authorize(Roles = "System,Sales")]
+    [HttpPost("create_area"), Authorize(Roles = "Administrator,Sales")]
     public async Task<IActionResult> create_area([FromBody] AreaDTO areaDTO)
     {
         if (!ModelState.IsValid)

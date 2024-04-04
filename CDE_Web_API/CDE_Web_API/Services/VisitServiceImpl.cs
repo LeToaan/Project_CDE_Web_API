@@ -51,10 +51,10 @@ public class VisitServiceImpl : VisitService
             var email = _authAccountService.getAccount();
             var account = _dbContext.Accounts.FirstOrDefault(a => a.Email == email);
             var distributor = await _dbContext.Distributors.FirstOrDefaultAsync(p => p.Id == visit.DistributorId);
-            if (distributor.PositionGroupId != 3 || distributor == null)
+           /* if (distributor.PositionGroupId != 3 || distributor == null)
             {
                 return new BadRequestObjectResult(new { msg = "Please, choose Distributor!" });
-            }
+            }*/
 
             visit.Status = 1;
             visit.Creator = account.Id;

@@ -24,7 +24,7 @@ public class VisitController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_visit"), Authorize(Roles = "System")]
+    [HttpPost("create_visit"), Authorize(Roles = "Administrator")]
     public async Task<IActionResult> create_visit([FromBody] VisitDTO visitDTO)
     {
         if (!ModelState.IsValid)

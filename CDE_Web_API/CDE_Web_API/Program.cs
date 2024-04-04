@@ -52,6 +52,7 @@ builder.Services.AddScoped<VisitService, VisitServiceImpl>();
 builder.Services.AddScoped<TaskService, TaskServiceImpl>();
 builder.Services.AddScoped<AccountAccessorService, AccountAccessorServiceImpl>();
 builder.Services.AddScoped<PermissionService, PermissionServiceImpl>();
+builder.Services.AddScoped<StaffService, StaffServiceImpl>();
 
 builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();

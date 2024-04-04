@@ -61,14 +61,11 @@ public class AccountServiceImpl : AccountService
                 }
 
                 var position_title = await _dbContext.PositionTitles.FirstOrDefaultAsync(p => p.Id == user.PositionTitleId);
-            if(position_title.PositionGroupId != 4) 
+            if(!position_title.PositionGroup.Name.Equals("Guest")) 
             {
                 return new BadRequestObjectResult(new { msg = "Just Position Guest!!" });
             }
-            else
-            {
-                user.PositionGroupId = 4;
-            }
+            
                 var password = GenaratePassword.CreatePassword(6);
                 var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
                 user.Password = hashPassword;
@@ -79,16 +76,6 @@ public class AccountServiceImpl : AccountService
                  _dbContext.Accounts.Add(user);
                 if(await _dbContext.SaveChangesAsync() > 0)
                 {
-                    var tokentVerify = new Tokent();
-                    tokentVerify.VerificationToken = ContenMailHelper.CreateRandomToken();
-                    tokentVerify.VerifiedAt = DateTime.Now;
-                    _dbContext.Tokents.Add(tokentVerify);
-                        if(await _dbContext.SaveChangesAsync() > 0)
-                    {
-                    user.TokentId = tokentVerify.Id;
-                    _dbContext.Entry(user).State = EntityState.Modified;
-                    await _dbContext.SaveChangesAsync();
-                    }
                     var mailHelper = new MailHelper(_configuration);
                     mailHelper.Send(_configuration["Gmail:Username"], user.Email,
                     "Information Your Account", ContenMailHelper.content(password));
@@ -121,13 +108,9 @@ public class AccountServiceImpl : AccountService
             if (user != null )
             {
                 var position_title = await _dbContext.PositionTitles.FirstOrDefaultAsync(p => p.Id == user.PositionTitleId);
-                if (position_title.PositionGroupId != 4)
+                if (!position_title.PositionGroup.Name.Equals("Guest"))
                 {
                     return new BadRequestObjectResult(new { msg = "Just Position Guest!!" });
-                }
-                else
-                {
-                    user_.PositionGroupId = 4;
                 }
                     user_.PositionTitleId = user.PositionTitleId;
                     user_.Fullname = user.Fullname;
@@ -170,13 +153,9 @@ public class AccountServiceImpl : AccountService
             }
 
             var position = await _dbContext.PositionTitles.FirstOrDefaultAsync(p => p.Id == user.PositionTitleId);
-            if (position.PositionGroupId != 2)
+            if (!position.PositionGroup.Name.Equals("Sales"))
             {
                 return new BadRequestObjectResult(new { msg = "Just Position Sales!" });
-            }else
-            {
-                user.PositionGroupId = position.PositionGroupId;
-
             }
             var password = GenaratePassword.CreatePassword(6);
             var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
@@ -185,16 +164,6 @@ public class AccountServiceImpl : AccountService
             _dbContext.Accounts.Add(user);
             if (await _dbContext.SaveChangesAsync() > 0)
             {
-                var tokentVerify = new Tokent();
-                tokentVerify.VerificationToken = ContenMailHelper.CreateRandomToken();
-                tokentVerify.VerifiedAt = DateTime.Now;
-                _dbContext.Tokents.Add(tokentVerify);
-                if (await _dbContext.SaveChangesAsync() > 0)
-                {
-                    user.TokentId = tokentVerify.Id;
-                    _dbContext.Entry(user).State = EntityState.Modified;
-                    await _dbContext.SaveChangesAsync();
-                }
                 var mailHelper = new MailHelper(_configuration);
                 mailHelper.Send(_configuration["Gmail:Username"], user.Email,
                 "Information Your Account", ContenMailHelper.content(password));
@@ -215,33 +184,92 @@ public class AccountServiceImpl : AccountService
 
     public async Task<IActionResult> update_sales(AccountSalesUpdateDTO accountSalesDTO, int id)
     {
-        Account user = _mapper.Map<Account>(accountSalesDTO);
         try
         {
-            Thread thread = Thread.CurrentThread;
-            Console.WriteLine("thread: " + thread.Name);
-            Console.WriteLine("is thread pool thread" + thread.IsThreadPoolThread);
-            var email = _authAccountService.getAccount();
-            var account = _dbContext.Accounts.FirstOrDefault(a => a.Email == email);
             var user_ = _dbContext.Accounts.FirstOrDefault(u => u.Id == id);
-            if (user_ != null && user_.PositionGroupId == 2)
+            if (user_ != null && user_.PositionTitle.PositionGroup.Name.Equals("Sales"))
             {
-                if (account.PositionGroupId == 1)
+                if (accountSalesDTO.Email == user_.Email)
                 {
-                    var position = await _dbContext.PositionTitles.FirstOrDefaultAsync(p => p.Id == user.PositionTitleId);
-                    var distributor = await _dbContext.Accounts.FirstOrDefaultAsync(d => d.Id == user.Id);
-                    if (position.PositionGroupId != 2 && distributor.PositionGroupId != 3)
+                    var position = await _dbContext.PositionTitles.FirstOrDefaultAsync(p => p.Id == accountSalesDTO.PositionTitleId);
+                    if (!position.PositionGroup.Name.Equals("Sales"))
                     {
                         return new BadRequestObjectResult(new { msg = "Just Position Sales!" });
                     }
                     else
                     {
-                        user_.PositionTitleId = user.PositionTitleId;
-                        user_.DistributorId = user.DistributorId;
+                        user_.PositionTitleId = accountSalesDTO.PositionTitleId;
                     }
-                    user_.Fullname = user.Fullname;
-                    user_.Email = user.Email;
-                    user_.Status = user.Status;
+
+                    var distributor = "[" + string.Join(", ", accountSalesDTO.DistributorId) + "]";
+                    string numbersString = distributor.Replace("[", "").Replace("]", "");
+
+                    string[] numberStrings = numbersString.Split(',');
+
+                    int[] numbers = numberStrings.Select(s => int.Parse(s.Trim())).ToArray();
+
+                    foreach (int number in numbers)
+                    {
+                        var distributor_find = await _dbContext.Distributors.FirstOrDefaultAsync(p => p.Id == number);
+                        if (distributor_find == null)
+                        {
+                            return new BadRequestObjectResult(new { msg = "Distributor not exisit!" });
+                        }
+                    }
+
+
+                    user_.Fullname = accountSalesDTO.Fullname;
+                    user_.Email = accountSalesDTO.Email;
+                    user_.Status = accountSalesDTO.Status;
+                    user_.DistributorId = distributor;
+                    _dbContext.Entry(user_).State = EntityState.Modified;
+                    if (await _dbContext.SaveChangesAsync() > 0)
+                    {
+                        return new OkObjectResult(new { msg = true });
+                    }
+                    else
+                    {
+                        return new BadRequestObjectResult(new { msg = false });
+                    }
+                }else
+                {
+                    var email_exists = await _dbContext.Accounts.FirstOrDefaultAsync(e => e.Email == accountSalesDTO.Email);
+                    if (email_exists != null)
+                    {
+                        return new BadRequestObjectResult(new { msg = "Email realdy exists!" });
+                    }
+
+                    var position = await _dbContext.PositionTitles.FirstOrDefaultAsync(p => p.Id == accountSalesDTO.PositionTitleId);
+                    if (!position.PositionGroup.Name.Equals("Sales"))
+                    {
+                        return new BadRequestObjectResult(new { msg = "Just Position Sales!" });
+                    }
+                    else
+                    {
+                        user_.PositionTitleId = accountSalesDTO.PositionTitleId;
+                    }
+
+                    var distributor = "[" + string.Join(", ", accountSalesDTO.DistributorId) + "]";
+                    string numbersString = distributor.Replace("[", "").Replace("]", "");
+
+                    string[] numberStrings = numbersString.Split(',');
+
+                    int[] numbers = numberStrings.Select(s => int.Parse(s.Trim())).ToArray();
+
+                    foreach (int number in numbers)
+                    {
+                        var distributor_find = await _dbContext.Distributors.FirstOrDefaultAsync(p => p.Id == number);
+                        if (distributor_find == null)
+                        {
+                            return new BadRequestObjectResult(new { msg = "Distributor not exisit!" });
+                        }
+                    }
+
+
+                    user_.Fullname = accountSalesDTO.Fullname;
+                    user_.Email = accountSalesDTO.Email;
+                    user_.Status = accountSalesDTO.Status;
+                    user_.DistributorId = distributor;
                     _dbContext.Entry(user_).State = EntityState.Modified;
                     if (await _dbContext.SaveChangesAsync() > 0)
                     {
@@ -252,11 +280,6 @@ public class AccountServiceImpl : AccountService
                         return new BadRequestObjectResult(new { msg = false });
                     }
                 }
-                else
-                {
-                    return new BadRequestObjectResult(new { msg = "You are not qualified!" });
-                }
-
 
             }
             else
@@ -279,15 +302,16 @@ public class AccountServiceImpl : AccountService
             return new BadRequestObjectResult(new { msg = "User not found!" });
         }else
         {
-                var tokent = await _dbContext.Tokents.FirstOrDefaultAsync(t => t.Id == user.TokentId);
-                tokent.PasswordResetToken = GenaratePassword.CreatePassword(6);
-                tokent.ResetTokenExpires = DateTime.Now.AddMinutes(30);
+            var tokent = "a";
+                //var tokent = await _dbContext.Tokents.FirstOrDefaultAsync(t => t.Id == user.TokentId);
+                //tokent.PasswordResetToken = GenaratePassword.CreatePassword(6);
+                //tokent.ResetTokenExpires = DateTime.Now.AddMinutes(30);
                 _dbContext.Entry(tokent).State = EntityState.Modified;
             if (await _dbContext.SaveChangesAsync() > 0)
             {
-                var mailHelper = new MailHelper(_configuration);
-                mailHelper.Send(_configuration["Gmail:Username"], user.Email,
-                "Code Reset Password", ContenMailHelper.content(tokent.PasswordResetToken));
+                //var mailHelper = new MailHelper(_configuration);
+                //mailHelper.Send(_configuration["Gmail:Username"], user.Email,
+                //"Code Reset Password", ContenMailHelper.content(tokent.PasswordResetToken));
                 return new OkObjectResult(new { msg = "Check your mail to take code!" });
             }else
             {
@@ -307,7 +331,8 @@ public class AccountServiceImpl : AccountService
         try
         {
             var tokent = await _dbContext.Tokents.FirstOrDefaultAsync(t => t.PasswordResetToken == code);
-            var user = await _dbContext.Accounts.FirstOrDefaultAsync(u => u.TokentId == tokent.Id);
+            //var user = await _dbContext.Accounts.FirstOrDefaultAsync(u => u.TokentId == tokent.Id);
+            var user = new Account();
             if (tokent == null || tokent.ResetTokenExpires < DateTime.Now)
             {
                 return new BadRequestObjectResult(new { msg = "Code Invalid or Expired!" });
@@ -343,11 +368,18 @@ public class AccountServiceImpl : AccountService
             {
                 return new BadRequestObjectResult(new { msg = "User not found!" });
             }
-            _dbContext.Accounts.Remove(id_user);
-            if(await _dbContext.SaveChangesAsync() > 0)
+            if (id_user.PositionTitle.PositionGroup.Name.Equals("Guest")){
+                _dbContext.Accounts.Remove(id_user);
+                            if(await _dbContext.SaveChangesAsync() > 0)
+                            {
+                                return new OkObjectResult(new { msg = "Delete success!" });
+                            }else { return new BadRequestObjectResult(new { msg = "Delete failed!" }); }
+            }
+            else
             {
-                return new OkObjectResult(new { msg = "Delete success!" });
-            }else { return new BadRequestObjectResult(new { msg = "Delete failed!" }); }
+                return new BadRequestObjectResult(new { msg = "Delete Failed!" });
+            }
+            
         }catch(Exception e)
         {
             return new BadRequestObjectResult(new {msg = e.Message});

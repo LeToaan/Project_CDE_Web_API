@@ -35,7 +35,7 @@ public class TaskController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_task/{id}"), Authorize(Roles = "System")]
+    [HttpPost("create_task/{id}"), Authorize(Roles = "Administrator")]
     public async Task<IActionResult> create_task([FromBody] TaskDTO taskDTO, int id)
     {
         if (!ModelState.IsValid)

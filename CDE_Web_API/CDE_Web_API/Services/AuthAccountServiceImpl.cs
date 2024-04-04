@@ -61,8 +61,17 @@ public class AuthAccountServiceImpl : AuthAccountService
                 {
                     if (BCrypt.Net.BCrypt.Verify(account.Password, user.Password))
                     {
-                        var positionGroup = await _dbContext.PositionGroups.AsNoTracking().FirstOrDefaultAsync(p => p.Id == user.PositionGroupId);
-                        string tokent = CreateTokent(user.Email, positionGroup.Name, user.PermissionId);
+                        
+                        var positionTitle = await _dbContext.PositionTitles.AsNoTracking().FirstOrDefaultAsync(p => p.Id == user.PositionTitleId);
+                        string tokent;
+                        if (user.PermissionId != null)
+                        {
+                            tokent = CreateTokent(user.Email, positionTitle.Name, user.PermissionId);
+                        }else
+                        {
+                            tokent = CreateTokent(user.Email, positionTitle.Name, null);
+                        }
+                        
                         return new OkObjectResult(tokent);
                     }else
                     {
@@ -86,15 +95,7 @@ public class AuthAccountServiceImpl : AuthAccountService
 
     private string CreateTokent(string email, string positionGroup, string permission)
     {
-            string numbersString = permission.Replace("[", "").Replace("]", "");
-
-            // Tách chuỗi thành các chuỗi con dựa trên dấu phẩy
-            string[] numberStrings = numbersString.Split(',');
-
-            // Chuyển đổi mỗi chuỗi con thành một số nguyên
-            int[] numbers = numberStrings.Select(s => int.Parse(s.Trim())).ToArray();
-
-            // In ra từng giá trị
+           
             
         List<Claim> claims = new List<Claim> {
             new Claim(ClaimTypes.Name, email),
@@ -102,12 +103,23 @@ public class AuthAccountServiceImpl : AuthAccountService
            
         };
 
-
-        foreach (int number in numbers)
+        if(permission != null)
         {
-            var permission_find = _dbContext.Permissions.FirstOrDefault(p => p.Id == number);
-            claims.Add(new Claim(ClaimTypes.Role, permission_find.Name));
+            string numbersString = permission.Replace("[", "").Replace("]", "");
+
+            string[] numberStrings = numbersString.Split(',');
+
+            int[] numbers = numberStrings.Select(s => int.Parse(s.Trim())).ToArray();
+
+            foreach (int number in numbers)
+                {
+                    var permission_find = _dbContext.Permissions.FirstOrDefault(p => p.Id == number);
+                    claims.Add(new Claim(ClaimTypes.Role, permission_find.Name));
+                }
         }
+
+
+       
 
         var authKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JWT:Secret").Value));
         var creds = new SigningCredentials(authKey, SecurityAlgorithms.HmacSha512Signature);
@@ -136,14 +148,13 @@ public class AuthAccountServiceImpl : AuthAccountService
 
     public dynamic getAccountSystems()
     {
-        var systems = _dbContext.Accounts.Where(s => s.PositionGroupId == 1).Select(account => new
+        var systems = _dbContext.Accounts.Where(s => s.PositionTitle.PositionGroup.Id == 1).Select(account => new
         {
             id = account.Id,
             fullname = account.Fullname,
             email = account.Email,
             phone = account.Phone,
             status = account.Status,
-            positionGroupId = account.PositionGroupId,
             positionTitleId = account.PositionTitleId,
             positionTitle = _dbContext.PositionTitles.Where(p => p.Id == account.PositionTitleId).Select(position => new
             {
@@ -157,19 +168,23 @@ public class AuthAccountServiceImpl : AuthAccountService
 
     public dynamic getAccountSales()
     {
-        var sales = _dbContext.Accounts.Where(s => s.PositionGroupId == 2).Select(account => new
+        var sales = _dbContext.Accounts.Where(s => s.PositionTitle.PositionGroup.Id == 2).Select(account => new
         {
             id = account.Id,
             fullname = account.Fullname,
             email = account.Email,
             phone = account.Phone,
             status = account.Status,
-            positionGroupId = account.PositionGroupId,
             positionTitleId = account.PositionTitleId,
             positionTitle = _dbContext.PositionTitles.Where(p => p.Id == account.PositionTitleId).Select(position => new
             {
                 id = position.Id,
                 name = position.Name,
+                positionGroup = new
+                {
+                    id = position.PositionGroup.Id,
+                    name = position.PositionGroup.Name
+                }
             }
                 ).FirstOrDefault()
         }).ToList();
@@ -178,16 +193,13 @@ public class AuthAccountServiceImpl : AuthAccountService
 
     public dynamic getAccountDistributor()
     {
-        var distributor = _dbContext.Distributors.Where(s => s.PositionGroupId == 3).Select(distributor_ => new
+        var distributor = _dbContext.Accounts.Where(s => s.PositionTitle.PositionGroup.Id == 3).Select(distributor_ => new
         {
-            id = distributor_.Id,
-            name = distributor_.Name,
-           
+            id = distributor_.Id,           
             email = distributor_.Email,
             phone = distributor_.Phone,
             status = distributor_.Status,
-            positionGroupId = distributor_.PositionGroupId,
-            saleManagement = _dbContext.Accounts.Where(a => a.Id == distributor_.SaleManagement).Select(account => new
+           /* saleManagement = _dbContext.Accounts.Where(a => a.Id == distributor_.SaleManagement).Select(account => new
             {
                 id = account.Id,
                 fullname = account.Fullname,
@@ -201,7 +213,7 @@ public class AuthAccountServiceImpl : AuthAccountService
                 }
                ).FirstOrDefault()
 
-            }).FirstOrDefault(),
+            }).FirstOrDefault(),*/
 
         }).ToList();
         return distributor;
@@ -209,14 +221,13 @@ public class AuthAccountServiceImpl : AuthAccountService
 
     public dynamic getAccountGuest()
     {
-        var guest = _dbContext.Accounts.Where(s => s.PositionGroupId == 4).Select(account => new
+        var guest = _dbContext.Accounts.Where(s => s.PositionTitle.PositionGroup.Id == 4).Select(account => new
         {
             id = account.Id,
             fullname = account.Fullname,
             email = account.Email,
             phone = account.Phone,
             status = account.Status,
-            positionGroupId = account.PositionGroupId,
             positionTitleId = account.PositionTitleId,
             positionTitle = _dbContext.PositionTitles.Where(p => p.Id == account.PositionTitleId).Select(position => new
             {

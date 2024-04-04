@@ -92,24 +92,6 @@ namespace CDE_Web_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Tokents",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VerificationToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VerifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PasswordResetToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ResetTokenExpires = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tokents", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserLists",
                 columns: table => new
                 {
@@ -139,32 +121,6 @@ namespace CDE_Web_API.Migrations
                         name: "FK_Permissions_PermissionModules_PermissionModulesId",
                         column: x => x.PermissionModulesId,
                         principalTable: "PermissionModules",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Distributors",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    SaleManagement = table.Column<int>(type: "int", maxLength: 250, nullable: false),
-                    Sales = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<bool>(type: "bit", nullable: false),
-                    PositionGroupId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Distributors", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Distributors_PositionGroups_PositionGroupId",
-                        column: x => x.PositionGroupId,
-                        principalTable: "PositionGroups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -206,14 +162,12 @@ namespace CDE_Web_API.Migrations
                     Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Superior = table.Column<int>(type: "int", nullable: true),
+                    Superior = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Inferior = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PermissionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PositionTitleId = table.Column<int>(type: "int", nullable: true),
-                    DistributorId = table.Column<int>(type: "int", nullable: true),
+                    DistributorId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AreaId = table.Column<int>(type: "int", nullable: true),
-                    PositionGroupId = table.Column<int>(type: "int", nullable: true),
-                    TokentId = table.Column<int>(type: "int", nullable: true)
+                    PositionTitleId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -224,40 +178,10 @@ namespace CDE_Web_API.Migrations
                         principalTable: "Areas",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Accounts_PositionGroups_PositionGroupId",
-                        column: x => x.PositionGroupId,
-                        principalTable: "PositionGroups",
+                        name: "FK_Accounts_PositionTitles_PositionTitleId",
+                        column: x => x.PositionTitleId,
+                        principalTable: "PositionTitles",
                         principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Accounts_Tokents_TokentId",
-                        column: x => x.TokentId,
-                        principalTable: "Tokents",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Visits",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Time = table.Column<short>(type: "smallint", nullable: true),
-                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Intent = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    Status = table.Column<short>(type: "smallint", nullable: true),
-                    Creator = table.Column<int>(type: "int", nullable: false),
-                    Guest = table.Column<int>(type: "int", nullable: true),
-                    DistributorId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Visits", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Visits_Distributors_DistributorId",
-                        column: x => x.DistributorId,
-                        principalTable: "Distributors",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -281,6 +205,32 @@ namespace CDE_Web_API.Migrations
                     table.ForeignKey(
                         name: "FK_CMSs_Accounts_CreatorAccountId",
                         column: x => x.CreatorAccountId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Distributors",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    SaleManagement = table.Column<int>(type: "int", nullable: false),
+                    Sales = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    AccountId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Distributors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Distributors_Accounts_AccountId",
+                        column: x => x.AccountId,
                         principalTable: "Accounts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -338,44 +288,46 @@ namespace CDE_Web_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Tasks",
+                name: "Tokents",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    File = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    Status = table.Column<short>(type: "smallint", nullable: true),
-                    DateStart = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DateEnd = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Report = table.Column<int>(type: "int", nullable: false),
-                    Implement = table.Column<int>(type: "int", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: true),
-                    VisitId = table.Column<int>(type: "int", nullable: false)
+                    PasswordResetToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResetTokenExpires = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AccountId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tasks", x => x.Id);
+                    table.PrimaryKey("PK_Tokents", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tasks_Accounts_Implement",
-                        column: x => x.Implement,
+                        name: "FK_Tokents_Accounts_AccountId",
+                        column: x => x.AccountId,
                         principalTable: "Accounts",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Visits",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Time = table.Column<short>(type: "smallint", nullable: true),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Intent = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Status = table.Column<short>(type: "smallint", nullable: true),
+                    Creator = table.Column<int>(type: "int", nullable: false),
+                    Guest = table.Column<int>(type: "int", nullable: true),
+                    DistributorId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Visits", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tasks_Accounts_Report",
-                        column: x => x.Report,
-                        principalTable: "Accounts",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Tasks_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Tasks_Visits_VisitId",
-                        column: x => x.VisitId,
-                        principalTable: "Visits",
+                        name: "FK_Visits_Distributors_DistributorId",
+                        column: x => x.DistributorId,
+                        principalTable: "Distributors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -427,11 +379,53 @@ namespace CDE_Web_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Rates",
+                name: "Tasks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    File = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Status = table.Column<short>(type: "smallint", nullable: true),
+                    DateStart = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DateEnd = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Report = table.Column<int>(type: "int", nullable: false),
+                    Implement = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: true),
+                    VisitId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tasks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tasks_Accounts_Implement",
+                        column: x => x.Implement,
+                        principalTable: "Accounts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Tasks_Accounts_Report",
+                        column: x => x.Report,
+                        principalTable: "Accounts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Tasks_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Tasks_Visits_VisitId",
+                        column: x => x.VisitId,
+                        principalTable: "Visits",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
                     RateValue = table.Column<short>(type: "smallint", nullable: true),
                     Comment = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -449,11 +443,10 @@ namespace CDE_Web_API.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Rates_Tasks_TaskId",
-                        column: x => x.TaskId,
+                        name: "FK_Rates_Tasks_Id",
+                        column: x => x.Id,
                         principalTable: "Tasks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -462,14 +455,9 @@ namespace CDE_Web_API.Migrations
                 column: "AreaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Accounts_PositionGroupId",
+                name: "IX_Accounts_PositionTitleId",
                 table: "Accounts",
-                column: "PositionGroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Accounts_TokentId",
-                table: "Accounts",
-                column: "TokentId");
+                column: "PositionTitleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Answers_SurveyRequestId",
@@ -482,9 +470,9 @@ namespace CDE_Web_API.Migrations
                 column: "CreatorAccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Distributors_PositionGroupId",
+                name: "IX_Distributors_AccountId",
                 table: "Distributors",
-                column: "PositionGroupId");
+                column: "AccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_NotifiUsers_NotificationId",
@@ -510,11 +498,6 @@ namespace CDE_Web_API.Migrations
                 name: "IX_Rates_RaterAccountId",
                 table: "Rates",
                 column: "RaterAccountId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Rates_TaskId",
-                table: "Rates",
-                column: "TaskId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SurveyDetails_UserAccountId",
@@ -547,6 +530,11 @@ namespace CDE_Web_API.Migrations
                 column: "VisitId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tokents_AccountId",
+                table: "Tokents",
+                column: "AccountId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Visits_DistributorId",
                 table: "Visits",
                 column: "DistributorId");
@@ -570,13 +558,13 @@ namespace CDE_Web_API.Migrations
                 name: "Permissions");
 
             migrationBuilder.DropTable(
-                name: "PositionTitles");
-
-            migrationBuilder.DropTable(
                 name: "Rates");
 
             migrationBuilder.DropTable(
                 name: "SurveyDetails");
+
+            migrationBuilder.DropTable(
+                name: "Tokents");
 
             migrationBuilder.DropTable(
                 name: "UserLists");
@@ -600,16 +588,16 @@ namespace CDE_Web_API.Migrations
                 name: "Visits");
 
             migrationBuilder.DropTable(
-                name: "Accounts");
+                name: "Distributors");
 
             migrationBuilder.DropTable(
-                name: "Distributors");
+                name: "Accounts");
 
             migrationBuilder.DropTable(
                 name: "Areas");
 
             migrationBuilder.DropTable(
-                name: "Tokents");
+                name: "PositionTitles");
 
             migrationBuilder.DropTable(
                 name: "PositionGroups");

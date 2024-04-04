@@ -74,7 +74,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create-user"), Authorize(Roles = "System ,Sales")]
+    [HttpPost("create-user"), Authorize(Roles = "Administrator ,Sales")]
     public async Task<IActionResult> create_user([FromBody] AccountDTO accountDTO)
     {
        
@@ -83,7 +83,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update-user/{id}"), Authorize(Roles = "System ,Sales")]
+    [HttpPut("update-user/{id}"), Authorize(Roles = "Administrator ,Sales")]
     public async Task<IActionResult> update_user([FromBody] AccountDTO accountDTO, int id)
     {
         
@@ -92,7 +92,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("delete-user/{id}"), Authorize(Roles = "System ,Sales")]
+    [HttpPut("delete-user/{id}"), Authorize(Roles = "Administrator ,Sales")]
     public async Task<IActionResult> delete_user(int id)
     {
        
@@ -109,7 +109,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create-sales"), Authorize(Roles = "System")]
+    [HttpPost("create-sales"), Authorize(Roles = "Administrator")]
     public async Task<IActionResult> create_sales([FromBody] AccountSalesDTO accountSalesDTO)
     {
         if (!ModelState.IsValid)
@@ -121,7 +121,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update-sales/{id}"), Authorize(Roles = "System")]
+    [HttpPut("update-sales/{id}"), Authorize(Roles = "Administrator")]
     public async Task<IActionResult> update_sales([FromBody] AccountSalesUpdateDTO accountSalesDTO, int id)
     {
         if (!ModelState.IsValid)

@@ -35,22 +35,17 @@ public class Account
 
     public DateTime? Created { get; set; }
 
-    public int? Superior { get; set; }
+    public string? Superior { get; set; }
 
     public string? Inferior { get; set; }
 
     public string? PermissionId { get; set; }
-    public int? PositionTitleId { get; set; }
-    public int? DistributorId { get; set; }
+    public string? DistributorId { get; set; }
 
     public int? AreaId { get; set; }
     public virtual Area? Area { get; set; }
-
-    public int? PositionGroupId { get; set; }
-    public virtual PositionGroup? PositionGroup { get; set; }
-
-    public int? TokentId { get; set; }
-    public virtual Tokent? Tokent { get; set; }
+    public int? PositionTitleId { get; set; }
+    public virtual PositionTitle? PositionTitle { get; set; }
 
     public Dictionary<int, Permission> Permissions = new Dictionary<int, Permission>();
 }

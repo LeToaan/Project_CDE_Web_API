@@ -56,40 +56,26 @@ public class DistributorServiceImpl : DistributorService
                 return new BadRequestObjectResult(new { msg = "Distributor already exists!" });
             }
 
-            distributor.PositionGroupId = 3;
+            Account account = new Account();
+            var password = GenaratePassword.CreatePassword(6);
+            var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
+            account.Password = hashPassword;
+            account.Fullname = distributor.Name;
+            account.Email = distributor.Email;
+            account.Phone = distributor.Phone;
+            account.Address = distributor.Address;
+            account.Status = distributor.Status;
+            account.Created = DateTime.Now;
+            account.PositionTitleId = 10;
 
-            _dbContext.Distributors.Add(distributor);
+            _dbContext.Accounts.Add(account);
             if (await _dbContext.SaveChangesAsync() > 0)
             {
-                //var area = _dbContext.Areas.FirstOrDefault(a => a.Id == 1);
-                Account account = new Account();
-                var password = GenaratePassword.CreatePassword(6);
-                var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
-                account.Password = hashPassword;
-                account.Fullname = distributor.Name;
-                account.Email = distributor.Email;
-                account.Phone = distributor.Phone;
-                account.Address = distributor.Address;
-                account.Status = distributor.Status;
-                account.Created = DateTime.Now;
-                // account.AreaId = 1;
-                account.PositionGroupId = 3;
-                var positionTitle = await _dbContext.PositionTitles.FirstOrDefaultAsync(
-                    p => p.PositionGroupId == account.PositionGroupId);
-                account.PositionTitleId = positionTitle.Id;
-                account.DistributorId = distributor.Id;
-                _dbContext.Accounts.Add(account);
-
-                var tokentVerify = new Tokent();
-                tokentVerify.VerificationToken = ContenMailHelper.CreateRandomToken();
-                tokentVerify.VerifiedAt = DateTime.Now;
-                _dbContext.Tokents.Add(tokentVerify);
-                if (await _dbContext.SaveChangesAsync() > 0)
-                {
-                    account.TokentId = tokentVerify.Id;
-                    _dbContext.Entry(account).State = EntityState.Modified;
-                    await _dbContext.SaveChangesAsync();
-                }
+                
+                distributor.AccountId = account.Id;
+                _dbContext.Distributors.Add(distributor);
+                
+                await _dbContext.SaveChangesAsync();
                 var mailHelper = new MailHelper(_configuration);
                 mailHelper.Send(_configuration["Gmail:Username"], account.Email,
                 "Information Your Account", ContenMailHelper.content(password));
@@ -115,7 +101,7 @@ public class DistributorServiceImpl : DistributorService
         try
         {
             var distributor_find = await _dbContext.Distributors.FirstOrDefaultAsync(d => d.Id == id);
-            if (distributor_find == null || distributor_find.PositionGroup.Name != "Distributor")
+            if (distributor_find == null || distributor_find.Account.PositionTitle.Name != "Distributor")
             {
                 return new BadRequestObjectResult(new { msg = "Distributor not exists or Invalid!" });
             }else
