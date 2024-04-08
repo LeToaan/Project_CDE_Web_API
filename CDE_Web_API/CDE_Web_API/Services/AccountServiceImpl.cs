@@ -302,16 +302,28 @@ public class AccountServiceImpl : AccountService
             return new BadRequestObjectResult(new { msg = "User not found!" });
         }else
         {
-            var tokent = "a";
-                //var tokent = await _dbContext.Tokents.FirstOrDefaultAsync(t => t.Id == user.TokentId);
-                //tokent.PasswordResetToken = GenaratePassword.CreatePassword(6);
-                //tokent.ResetTokenExpires = DateTime.Now.AddMinutes(30);
+                var tokent = await _dbContext.Tokents.FirstOrDefaultAsync(t => t.AccountId == user.Id);
+            if (tokent == null)
+            {
+                Tokent tokent_ = new Tokent();
+                tokent_.PasswordResetToken = GenaratePassword.CreatePassword(6);
+                tokent_.ResetTokenExpires = DateTime.Now.AddMinutes(5);
+                tokent_.AccountId = user.Id;
+                _dbContext.Tokents.Add(tokent_);
+                tokent = tokent_;
+            }
+            else
+            {
+                tokent.PasswordResetToken = GenaratePassword.CreatePassword(6);
+                tokent.ResetTokenExpires = DateTime.Now.AddMinutes(5);
                 _dbContext.Entry(tokent).State = EntityState.Modified;
+            }
+                
             if (await _dbContext.SaveChangesAsync() > 0)
             {
-                //var mailHelper = new MailHelper(_configuration);
-                //mailHelper.Send(_configuration["Gmail:Username"], user.Email,
-                //"Code Reset Password", ContenMailHelper.content(tokent.PasswordResetToken));
+                var mailHelper = new MailHelper(_configuration);
+                mailHelper.Send(_configuration["Gmail:Username"], user.Email,
+                "Code Reset Password", ContenMailHelper.content(tokent.PasswordResetToken));
                 return new OkObjectResult(new { msg = "Check your mail to take code!" });
             }else
             {
@@ -331,8 +343,7 @@ public class AccountServiceImpl : AccountService
         try
         {
             var tokent = await _dbContext.Tokents.FirstOrDefaultAsync(t => t.PasswordResetToken == code);
-            //var user = await _dbContext.Accounts.FirstOrDefaultAsync(u => u.TokentId == tokent.Id);
-            var user = new Account();
+            var user = tokent.Account;
             if (tokent == null || tokent.ResetTokenExpires < DateTime.Now)
             {
                 return new BadRequestObjectResult(new { msg = "Code Invalid or Expired!" });
@@ -344,7 +355,7 @@ public class AccountServiceImpl : AccountService
             _dbContext.Entry(user).State = EntityState.Modified;
             tokent.PasswordResetToken = null;
             tokent.ResetTokenExpires = null;
-            _dbContext.Entry(user).State = EntityState.Modified;
+            _dbContext.Entry(tokent).State = EntityState.Modified;
             if (await _dbContext.SaveChangesAsync() > 0)
             {
                 return new OkObjectResult(new { msg = "Reset password success!" });
@@ -377,12 +388,42 @@ public class AccountServiceImpl : AccountService
             }
             else
             {
-                return new BadRequestObjectResult(new { msg = "Delete Failed!" });
+                return new BadRequestObjectResult(new { msg = "Just was delete sales!!" });
             }
             
         }catch(Exception e)
         {
             return new BadRequestObjectResult(new {msg = e.Message});
+        }
+    }
+
+    public async Task<IActionResult> delete_sales(int id)
+    {
+        try
+        {
+            var id_user = await _dbContext.Accounts.FindAsync(id);
+            if (id_user == null)
+            {
+                return new BadRequestObjectResult(new { msg = "User not found!" });
+            }
+            if (id_user.PositionTitle.PositionGroup.Name.Equals("Sales"))
+            {
+                _dbContext.Accounts.Remove(id_user);
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    return new OkObjectResult(new { msg = "Delete success!" });
+                }
+                else { return new BadRequestObjectResult(new { msg = "Delete failed!" }); }
+            }
+            else
+            {
+                return new BadRequestObjectResult(new { msg = "Just was delete sales!" });
+            }
+
+        }
+        catch (Exception e)
+        {
+            return new BadRequestObjectResult(new { msg = e.Message });
         }
     }
 }

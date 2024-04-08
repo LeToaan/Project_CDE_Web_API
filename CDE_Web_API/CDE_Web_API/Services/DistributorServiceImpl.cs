@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
+using System;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -101,7 +102,7 @@ public class DistributorServiceImpl : DistributorService
         try
         {
             var distributor_find = await _dbContext.Distributors.FirstOrDefaultAsync(d => d.Id == id);
-            if (distributor_find == null || distributor_find.Account.PositionTitle.Name != "Distributor")
+            if (distributor_find == null || !distributor_find.Account.PositionTitle.Name.Equals("Distributor - OM/TL"))
             {
                 return new BadRequestObjectResult(new { msg = "Distributor not exists or Invalid!" });
             }else
@@ -142,6 +143,65 @@ public class DistributorServiceImpl : DistributorService
         catch (Exception ex)
         {
             return new BadRequestObjectResult(new { msg = ex.Message });
+        }
+    }
+
+    public async Task<IActionResult> delete_distriburot(int idDistributor)
+    {
+        try
+        {
+            var distributor = await _dbContext.Distributors.FindAsync(idDistributor);
+            if(distributor == null)
+            {
+                return new BadRequestObjectResult(new { msg = "Distributor not found!" });
+            }
+            if (!distributor.Account.PositionTitle.PositionGroup.Name.Equals("Distributor"))
+            {
+                return new BadRequestObjectResult(new { msg = "Just was delete Distributor!" });
+            }
+
+            var accounts = await _dbContext.Accounts.Where(a => a.DistributorId != null).ToListAsync();
+
+            foreach(var acc in accounts)
+            {
+                if (acc.DistributorId != null)
+                {
+                    string distributorIdString = acc.DistributorId.Replace("[", "").Replace("]", "");
+
+                    string[] distributorIdStrings = distributorIdString.Split(',');
+
+                    int[] distributorIds = distributorIdStrings.Select(s => int.Parse(s.Trim())).ToArray();
+
+                    int indexRemove = 0;
+                    foreach (int distributorId in distributorIds)
+                    {
+                        if (distributor.Id == distributorId)
+                        {
+                            distributorIds = distributorIds.Where((val, index) => index != indexRemove).ToArray();
+                            var distributorUpdate = "[" + string.Join(", ", distributorIds) + "]";
+                            acc.DistributorId = distributorUpdate;
+                            _dbContext.Entry(acc).State = EntityState.Modified;
+                        }
+                        indexRemove++;
+                    }
+                }
+            }
+
+           
+
+            _dbContext.Distributors.Remove(distributor);
+            _dbContext.Accounts.Remove(distributor.Account);
+            if (await _dbContext.SaveChangesAsync() > 0)
+            {
+               
+
+                return new OkObjectResult(new { msg = "Delete Success" });
+            } else { 
+                return new BadRequestObjectResult(new { msg = "Delete Failed!" });}
+
+        }catch(Exception ex)
+        {
+            return new BadRequestObjectResult(new { ex.Message });
         }
     }
 }

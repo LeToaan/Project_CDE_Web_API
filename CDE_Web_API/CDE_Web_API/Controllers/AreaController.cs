@@ -32,4 +32,29 @@ public class AreaController : Controller
         }
         return await areaService.creater_area(areaDTO);
     }
+
+
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [HttpPut("update_area/{idArea}"), Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> update_area(int idArea, string name)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return await areaService.update_area(idArea, name);
+    }
+
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [HttpDelete("delete_area/{idArea}"), Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> delete_area(int idArea)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return await areaService.delete_area(idArea);
+    }
 }

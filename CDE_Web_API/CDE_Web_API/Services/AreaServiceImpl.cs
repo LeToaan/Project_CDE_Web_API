@@ -71,15 +71,8 @@ public class AreaServiceImpl : AreaService
                 var area = await _dbContext.Areas.FirstOrDefaultAsync(a => a.Id == idArea);
                 if (name == area.AreaName)
                 {
-                    _dbContext.Entry(area).State = EntityState.Modified;
-                    if (await _dbContext.SaveChangesAsync() > 0)
-                    {
-                        return new OkObjectResult(new { result = "Update Success" });
-                    }
-                    else
-                    {
-                        return new OkObjectResult(new { result = false });
-                    }
+                    area.AreaName = name;
+                   
                 }
                 else
                 {
@@ -88,18 +81,20 @@ public class AreaServiceImpl : AreaService
                     {
                         return new BadRequestObjectResult(new { msg = "Area already exists!" });
                     }
-
-                    _dbContext.Areas.Add(area);
-                    if (await _dbContext.SaveChangesAsync() > 0)
-                    {
-                        return new OkObjectResult(new { result = true });
-                    }
-                    else
-                    {
-                        return new OkObjectResult(new { result = false });
-                    }
+                    area.AreaName = name;                    
                 }
-            }else
+                _dbContext.Entry(area).State = EntityState.Modified;
+
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    return new OkObjectResult(new { result = "Update Success" });
+                }
+                else
+                {
+                    return new OkObjectResult(new { result = false });
+                }
+            }
+            else
             {
                 return new BadRequestObjectResult(new { msg = "Area not emty!" });
             }
@@ -108,6 +103,39 @@ public class AreaServiceImpl : AreaService
         catch (Exception ex)
         {
             return new BadRequestObjectResult(new { msg = ex.Message });
+        }
+    }
+
+    public async Task<IActionResult> delete_area(int idArea)
+    {
+        try
+        {
+            var area = await _dbContext.Areas.FindAsync(idArea);
+            if (area == null)
+            {
+                return new BadRequestObjectResult(new { msg = "Area not found!" });
+            }
+
+            var staff = await _dbContext.Accounts.FirstOrDefaultAsync(s => s.AreaId == idArea);
+            
+            if (staff == null)
+            {
+                _dbContext.Areas.Remove(area);
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    return new OkObjectResult(new { msg = "Delete success!" });
+                }
+                else { return new BadRequestObjectResult(new { msg = "Delete failed!" }); }
+            }
+            else
+            {
+                return new BadRequestObjectResult(new { msg = "Area with code "+ area.AreaCode+" remove because area has user." });
+            }
+
+        }
+        catch (Exception e)
+        {
+            return new BadRequestObjectResult(new { msg = e.Message });
         }
     }
 }

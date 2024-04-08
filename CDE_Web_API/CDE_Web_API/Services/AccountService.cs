@@ -12,6 +12,8 @@ public interface AccountService
 
     public Task<IActionResult> update_sales(AccountSalesUpdateDTO accountSalesDTO, int id);
     public Task<IActionResult> delete_user(int id);
+    public Task<IActionResult> delete_sales(int id);
+
 
 
     public Task<IActionResult> forget_password(string email);

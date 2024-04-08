@@ -55,4 +55,16 @@ public class DistributorController : Controller
         }
         return await distributorService.update_distriburot(distributorDTO, id);
     }
+
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [HttpDelete("delete_distributor/{idDistributor}")]
+    public async Task<IActionResult> delete_distributor(int idDistributor)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return await distributorService.delete_distriburot(idDistributor);
+    }
 }
