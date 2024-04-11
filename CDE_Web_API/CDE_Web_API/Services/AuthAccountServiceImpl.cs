@@ -123,7 +123,7 @@ public class AuthAccountServiceImpl : AuthAccountService
 
         var authKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JWT:Secret").Value));
         var creds = new SigningCredentials(authKey, SecurityAlgorithms.HmacSha512Signature);
-        var expiry = DateTime.Now.AddHours(1);
+        var expiry = DateTime.Now.AddDays(7);
 
         var tokent = new JwtSecurityToken
             (

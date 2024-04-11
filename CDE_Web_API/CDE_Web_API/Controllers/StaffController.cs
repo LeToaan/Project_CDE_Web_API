@@ -11,18 +11,15 @@ namespace CDE_Web_API.Controllers;
 public class StaffController : ControllerBase
 {
     private StaffService staffService;
-    private AccountService accountService;
     private AuthAccountService authAccountService;
     private PositionTitleService positionTitleService;
     
     public StaffController(
         StaffService _staffService,
-        AccountService _accountService,
         AuthAccountService _authAccountService,
         PositionTitleService _positionTitleService
         ) { 
         staffService = _staffService;
-        accountService = _accountService;
         authAccountService = _authAccountService;
         positionTitleService = _positionTitleService;
     }
@@ -45,14 +42,14 @@ public class StaffController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create-sales"), Authorize(Roles = "Administrator")]
-    public async Task<IActionResult> create_sales([FromBody] AccountSalesDTO accountSalesDTO)
+    [HttpPost("create-sales/{idArea}"), Authorize(Roles = "Administrator, VPCD, Add new users")]
+    public async Task<IActionResult> create_sales(int idArea,[FromBody] AccountSalesDTO accountSalesDTO)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-        return await accountService.creater_sales(accountSalesDTO);
+        return await staffService.creater_sales(idArea ,accountSalesDTO);
     }
 
     [Produces("application/json")]
@@ -64,7 +61,7 @@ public class StaffController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        return await accountService.update_sales(accountSalesDTO, id);
+        return await staffService.update_sales(accountSalesDTO, id);
     }
 
     [Produces("application/json")]
@@ -73,6 +70,6 @@ public class StaffController : ControllerBase
     public async Task<IActionResult> delete_sales(int id)
     {
 
-        return await accountService.delete_sales(id);
+        return await staffService.delete_sales(id);
     }
 }

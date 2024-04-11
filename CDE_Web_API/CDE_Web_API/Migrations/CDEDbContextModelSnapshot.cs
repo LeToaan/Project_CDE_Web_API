@@ -81,14 +81,16 @@ namespace CDE_Web_API.Migrations
                     b.Property<bool?>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Superior")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("SuperiorId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AreaId");
 
                     b.HasIndex("PositionTitleId");
+
+                    b.HasIndex("SuperiorId");
 
                     b.ToTable("Accounts");
                 });
@@ -654,9 +656,15 @@ namespace CDE_Web_API.Migrations
                         .WithMany()
                         .HasForeignKey("PositionTitleId");
 
+                    b.HasOne("CDE_Web_API.Models.Account", "Superior")
+                        .WithMany()
+                        .HasForeignKey("SuperiorId");
+
                     b.Navigation("Area");
 
                     b.Navigation("PositionTitle");
+
+                    b.Navigation("Superior");
                 });
 
             modelBuilder.Entity("CDE_Web_API.Models.Answer", b =>

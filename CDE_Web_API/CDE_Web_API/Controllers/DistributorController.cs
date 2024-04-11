@@ -34,14 +34,14 @@ public class DistributorController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_distributor"), Authorize(Roles = "Administrator, Create new distributor")]
-    public async Task<IActionResult> create_distributor([FromBody] DistributorDTO distributorDTO)
+    [HttpPost("create_distributor/{idArea}"), Authorize(Roles = "Administrator, Create new distributor")]
+    public async Task<IActionResult> create_distributor(int idArea, [FromBody] DistributorDTO distributorDTO)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-        return await distributorService.creater_distriburot(distributorDTO);
+        return await distributorService.creater_distriburot(idArea, distributorDTO);
     }
 
     [Produces("application/json")]
@@ -58,7 +58,7 @@ public class DistributorController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpDelete("delete_distributor/{idDistributor}")]
+    [HttpDelete("delete_distributor/{idDistributor}"), Authorize(Roles = "Administrator, Update detail distributor")]
     public async Task<IActionResult> delete_distributor(int idDistributor)
     {
         if (!ModelState.IsValid)

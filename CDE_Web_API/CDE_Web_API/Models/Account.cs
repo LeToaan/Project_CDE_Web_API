@@ -35,7 +35,8 @@ public class Account
 
     public DateTime? Created { get; set; }
 
-    public string? Superior { get; set; }
+    public int? SuperiorId { get; set; }
+    public virtual Account? Superior { get; set; }
 
     public string? Inferior { get; set; }
 

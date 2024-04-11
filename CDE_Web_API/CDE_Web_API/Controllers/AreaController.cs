@@ -22,6 +22,17 @@ public class AreaController : Controller
     }
 
     [Produces("application/json")]
+    [HttpGet("area-detail/{idArea}")]
+    public async Task<dynamic> area_Detail(int idArea)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return areaService.area_detail(idArea);
+    }
+
+    [Produces("application/json")]
     [Consumes("application/json")]
     [HttpPost("create_area"), Authorize(Roles = "Administrator,Sales")]
     public async Task<IActionResult> create_area([FromBody] AreaDTO areaDTO)

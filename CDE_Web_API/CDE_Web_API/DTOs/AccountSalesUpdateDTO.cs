@@ -14,7 +14,7 @@ public class AccountSalesUpdateDTO
    
     [Required]
     public int? Superior { get; set; }
-    public string? Inferior { get; set; }
+    public int[]? Inferior { get; set; }
 
     public int[]? DistributorId { get; set; }
     public bool? Status { get; set; }

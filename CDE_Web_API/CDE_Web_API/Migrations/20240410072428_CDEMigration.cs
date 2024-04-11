@@ -162,7 +162,7 @@ namespace CDE_Web_API.Migrations
                     Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Superior = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SuperiorId = table.Column<int>(type: "int", nullable: true),
                     Inferior = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PermissionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DistributorId = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -172,6 +172,11 @@ namespace CDE_Web_API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Accounts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Accounts_Accounts_SuperiorId",
+                        column: x => x.SuperiorId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Accounts_Areas_AreaId",
                         column: x => x.AreaId,
@@ -458,6 +463,11 @@ namespace CDE_Web_API.Migrations
                 name: "IX_Accounts_PositionTitleId",
                 table: "Accounts",
                 column: "PositionTitleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Accounts_SuperiorId",
+                table: "Accounts",
+                column: "SuperiorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Answers_SurveyRequestId",

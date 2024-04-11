@@ -42,16 +42,19 @@ public class DistributorServiceImpl : DistributorService
         _httpContextAccessor = httpContextAccessor;
         _authAccountService = authAccountService;
     }
-    public async Task<IActionResult> creater_distriburot(DistributorDTO distributorDTO)
+    public async Task<IActionResult> creater_distriburot(int idArea,DistributorDTO distributorDTO)
     {
 
-        Distributor distributor = _mapper.Map<Distributor>(distributorDTO);
+        Distributor distributor = new Distributor();
         try
         {
-            Thread thread = Thread.CurrentThread;
-
-            var distributorExit = _dbContext.Distributors.FirstOrDefault(a => a.Email == distributor.Email);
-            var account_ = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == distributor.Email);
+            var areaExist = _dbContext.Areas.FirstOrDefault(a => a.Id == idArea);
+            if (areaExist == null)
+            {
+                return new BadRequestObjectResult(new { msg = "Area not found!" });
+            }
+            var distributorExit = _dbContext.Distributors.FirstOrDefault(a => a.Email == distributorDTO.Email);
+            var account_ = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == distributorDTO.Email);
             if (distributorExit != null || account_ != null)
             {
                 return new BadRequestObjectResult(new { msg = "Distributor already exists!" });
@@ -61,19 +64,56 @@ public class DistributorServiceImpl : DistributorService
             var password = GenaratePassword.CreatePassword(6);
             var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
             account.Password = hashPassword;
-            account.Fullname = distributor.Name;
-            account.Email = distributor.Email;
-            account.Phone = distributor.Phone;
-            account.Address = distributor.Address;
-            account.Status = distributor.Status;
+            account.Fullname = distributorDTO.Name;
+            account.Email = distributorDTO.Email;
+            account.Phone = distributorDTO.Phone;
+            account.Address = distributorDTO.Address;
+            account.Status = distributorDTO.Status;
             account.Created = DateTime.Now;
             account.PositionTitleId = 10;
+            account.AreaId = idArea;
+
+            var salesMangement = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == distributorDTO.SaleManagement);
+            if (salesMangement == null)
+            {
+                return new BadRequestObjectResult(new { msg = "Sale Management not found!" });
+            }
+            if (salesMangement.PositionTitle.PositionGroup.Name.Equals("System") || salesMangement.PositionTitle.PositionGroup.Name.Equals("VPCD"))
+            {
+                return new BadRequestObjectResult(new { msg = "Sale Management Invalid!" });
+            }
+
+            var sales = "[" + string.Join(", ", distributorDTO.Sales) + "]";
+            string numbersStringSales = sales.Replace("[", "").Replace("]", "");
+
+            string[] numberStringsSales = numbersStringSales.Split(',');
+
+            int[] numbersSales = numberStringsSales.Select(s => int.Parse(s.Trim())).ToArray();
+            foreach (int number in numbersSales)
+            {
+                var user_sale = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == number);
+                if (user_sale == null)
+                {
+                    return new BadRequestObjectResult(new { msg = "User " + user_sale.Id + " not exisit!" });
+                }
+                if (!user_sale.PositionTitle.PositionGroup.Name.Equals("Distributor") ||
+                    !user_sale.PositionTitle.PositionGroup.Name.Equals("Distributor - OM/TL"))
+                {
+                    return new BadRequestObjectResult(new { msg = "Position user " + user_sale.Id + " Invalid!" });
+                }
+            }
 
             _dbContext.Accounts.Add(account);
             if (await _dbContext.SaveChangesAsync() > 0)
             {
                 
                 distributor.AccountId = account.Id;
+                distributor.Name = distributorDTO.Name;
+                distributor.Address = distributorDTO.Address;
+                distributor.Phone = distributorDTO.Phone;
+                distributor.SaleManagement = distributorDTO.SaleManagement;
+                distributor.Sales = sales;
+                distributor.Status = distributorDTO.Status;
                 _dbContext.Distributors.Add(distributor);
                 
                 await _dbContext.SaveChangesAsync();
@@ -98,7 +138,6 @@ public class DistributorServiceImpl : DistributorService
     public async Task<IActionResult> update_distriburot(DistributorUpdateDTO distributorDTO, int id)
     {
 
-        Distributor distributor = _mapper.Map<Distributor>(distributorDTO);
         try
         {
             var distributor_find = await _dbContext.Distributors.FirstOrDefaultAsync(d => d.Id == id);
@@ -107,24 +146,52 @@ public class DistributorServiceImpl : DistributorService
                 return new BadRequestObjectResult(new { msg = "Distributor not exists or Invalid!" });
             }else
             {
-                var distributorExit = _dbContext.Distributors.FirstOrDefault(a => a.Email == distributor.Email);
+                var distributorExit = _dbContext.Distributors.FirstOrDefault(a => a.Email == distributorDTO.Email);
                 var account = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == distributor_find.Email);
-                if ((distributorExit != null && distributor_find.Email != distributor.Email) || (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == distributor.Email) != null && distributor_find.Email != distributor.Email))
+                if ((distributorExit != null && distributor_find.Email != distributorDTO.Email) || (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == distributorDTO.Email) != null && distributor_find.Email != distributorDTO.Email))
                 {
                     return new BadRequestObjectResult(new { msg = "Distributor already exists or Invalid!" });
                 }
+                var salesMangement = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == distributorDTO.SaleManagement);
+                if (salesMangement == null)
+                {
+                    return new BadRequestObjectResult(new { msg = "Sale Management not found!" });
+                }
+                if (salesMangement.PositionTitle.PositionGroup.Name.Equals("System") || salesMangement.PositionTitle.PositionGroup.Name.Equals("VPCD"))
+                {
+                    return new BadRequestObjectResult(new { msg = "Sale Management Invalid!" });
+                }
 
-                distributor_find.Name = distributor.Name;
-                distributor_find.Email = distributor.Email;
-                distributor_find.Phone = distributor.Phone;
-                distributor_find.SaleManagement = distributor.SaleManagement;
-                distributor_find.Sales = distributor.Sales;
-                distributor_find.Status = distributor.Status;
+                var sales = "[" + string.Join(", ", distributorDTO.Sales) + "]";
+                string numbersStringSales = sales.Replace("[", "").Replace("]", "");
+
+                string[] numberStringsSales = numbersStringSales.Split(',');
+
+                int[] numbersSales = numberStringsSales.Select(s => int.Parse(s.Trim())).ToArray();
+                foreach (int number in numbersSales)
+                {
+                    var user_sale = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == number);
+                    if (user_sale == null)
+                    {
+                        return new BadRequestObjectResult(new { msg = "User " + user_sale.Id + " not exisit!" });
+                    }
+                    if (!user_sale.PositionTitle.PositionGroup.Name.Equals("Distributor") || 
+                        !user_sale.PositionTitle.PositionGroup.Name.Equals("Distributor - OM/TL"))
+                    {
+                        return new BadRequestObjectResult(new { msg = "Position user " + user_sale.Id + " Invalid!" });
+                    }
+                }
+                distributor_find.Name = distributorDTO.Name;
+                distributor_find.Email = distributorDTO.Email;
+                distributor_find.Phone = distributorDTO.Phone;
+                distributor_find.SaleManagement = distributorDTO.SaleManagement;
+                distributor_find.Sales = sales;
+                distributor_find.Status = distributorDTO.Status;
 
                 _dbContext.Entry(distributor_find).State = EntityState.Modified;
                 if (await _dbContext.SaveChangesAsync() > 0)
                 {
-                    //var area = _dbContext.Areas.FirstOrDefault(a => a.Id == 1);
+                    
                     account.Fullname = distributor_find.Name;
                     account.Email = distributor_find.Email;
                     account.Phone = distributor_find.Phone;

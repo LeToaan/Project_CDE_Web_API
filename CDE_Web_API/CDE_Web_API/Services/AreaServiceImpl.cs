@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Castle.Core.Internal;
 using CDE_Web_API.DTOs;
+using CDE_Web_API.Helpers;
 using CDE_Web_API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,9 +36,7 @@ public class AreaServiceImpl : AreaService
     {
         Area area = _mapper.Map<Area>(areaDTO);
         try
-        {
-            Thread thread = Thread.CurrentThread;
-            
+        {            
             var arearExit = await _dbContext.Areas.FirstOrDefaultAsync(a => a.AreaName == area.AreaName || a.AreaCode == area.AreaCode);
             if (arearExit != null)
             {
@@ -137,5 +136,26 @@ public class AreaServiceImpl : AreaService
         {
             return new BadRequestObjectResult(new { msg = e.Message });
         }
+    }
+
+    public dynamic area_detail(int idArea)
+    {
+        var user_area = _dbContext.Accounts.Where(a => a.AreaId == idArea).Select(account => new
+        {
+            id = account.Id,
+            fullname = account.Fullname,
+            email = account.Email,
+            position = account.PositionTitle.Name,
+            address = account.Address,
+            phone = account.Phone,
+            superior = account.Superior.PositionTitle.Name,
+        }).ToList();
+
+        if(user_area == null)
+        {
+            return null;
+        }
+
+        return user_area;
     }
 }

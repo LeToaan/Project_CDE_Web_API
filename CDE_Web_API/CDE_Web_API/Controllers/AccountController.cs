@@ -54,7 +54,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create-user"), Authorize(Roles = "Administrator ,Sales")]
+    [HttpPost("create-user"), Authorize(Roles = "Administrator")]
     public async Task<IActionResult> create_user([FromBody] AccountDTO accountDTO)
     {
        
@@ -63,7 +63,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update-user/{id}"), Authorize(Roles = "Administrator ,Sales")]
+    [HttpPut("update-user/{id}"), Authorize(Roles = "Administrator")]
     public async Task<IActionResult> update_user([FromBody] AccountDTO accountDTO, int id)
     {
         
@@ -72,7 +72,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpDelete("delete-user/{id}"), Authorize(Roles = "Administrator ,Sales")]
+    [HttpDelete("delete-user/{id}"), Authorize(Roles = "Administrator")]
     public async Task<IActionResult> delete_user(int id)
     {
        

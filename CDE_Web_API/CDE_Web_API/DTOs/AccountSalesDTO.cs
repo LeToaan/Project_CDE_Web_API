@@ -12,6 +12,6 @@ public class AccountSalesDTO
     public int PositionTitleId { get; set; }
     [Required]
     public int? Superior { get; set; }
-    public string? Inferior { get; set; }
+    public int[]? Inferior { get; set; }
     public bool Status { get; set; }
 }
