@@ -42,7 +42,7 @@ public class StaffController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create-sales/{idArea}"), Authorize(Roles = "Administrator, VPCD, Add new users")]
+    [HttpPost("create-sales/{idArea}"), Authorize(Roles = "Administrator, Owner, VPCD, Add new users")]
     public async Task<IActionResult> create_sales(int idArea,[FromBody] AccountSalesDTO accountSalesDTO)
     {
         if (!ModelState.IsValid)
@@ -54,7 +54,7 @@ public class StaffController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update-sales/{id}"), Authorize(Roles = "Administrator")]
+    [HttpPut("update-sales/{id}"), Authorize(Roles = "Administrator, Owner, VPCD, Update user detail")]
     public async Task<IActionResult> update_sales([FromBody] AccountSalesUpdateDTO accountSalesDTO, int id)
     {
         if (!ModelState.IsValid)
@@ -66,7 +66,7 @@ public class StaffController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpDelete("delete-sales/{id}"), Authorize(Roles = "Administrator")]
+    [HttpDelete("delete-sales/{id}"), Authorize(Roles = "Administrator, Owner, VPCD")]
     public async Task<IActionResult> delete_sales(int id)
     {
 

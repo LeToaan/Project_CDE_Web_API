@@ -21,20 +21,20 @@ public class PermissionController : ControllerBase
         authAccountService = _authAccountService;
     }
 
-    [Produces("application/json")]
+   /* [Produces("application/json")]
     [HttpGet("getPermission")]
     public ActionResult<dynamic> getPermission()
     {
         
         return permissionService.getPermission();
-    }
+    }*/
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("setPermission/{id}")]
-    public async Task<IActionResult> setPermission(int id, [FromBody] PermissionAccountDTO permissions)
+    [HttpPut("setPermission/{idUser}"), Authorize(Roles = "Administrator, Owner, Permission setting")]
+    public async Task<IActionResult> setPermission(int idUser, [FromBody] PermissionAccountDTO permissions)
     {
 
-        return await permissionService.setPermission(id, permissions);
+        return await permissionService.setPermission(idUser, permissions);
     }
 }

@@ -22,19 +22,51 @@ public class AreaController : Controller
     }
 
     [Produces("application/json")]
-    [HttpGet("area-detail/{idArea}")]
+    [HttpGet("area-manager"), Authorize(Roles = "Administrator, Owner, VPCD")]
+    public async Task<dynamic> area_manager()
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return areaService.area_manager(null);
+    }
+    [Produces("application/json")]
+    [HttpGet("area-search/areaKeyword"), Authorize(Roles = "Administrator, Owner, VPCD")]
+    public async Task<dynamic> area_search(string? areaKeyword)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return areaService.area_manager(areaKeyword);
+    }
+
+    [Produces("application/json")]
+    [HttpGet("area-detail/{idArea}"), Authorize(Roles = "Administrator, Owner, VPCD")]
     public async Task<dynamic> area_Detail(int idArea)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-        return areaService.area_detail(idArea);
+        return areaService.area_detail(idArea, null);
+    }
+
+    [Produces("application/json")]
+    [HttpGet("area-detail-searchUser/{idArea}/{userKeyword}"), Authorize(Roles = "Administrator, Owner, VPCD")]
+    public async Task<dynamic> area_Detail(int idArea, string? userKeyword)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return areaService.area_detail(idArea, userKeyword);
     }
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_area"), Authorize(Roles = "Administrator,Sales")]
+    [HttpPost("create_area"), Authorize(Roles = "Administrator, Owner, VPCD, Create new area")]
     public async Task<IActionResult> create_area([FromBody] AreaDTO areaDTO)
     {
         if (!ModelState.IsValid)
@@ -47,7 +79,7 @@ public class AreaController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update_area/{idArea}"), Authorize(Roles = "Administrator")]
+    [HttpPut("update_area/{idArea}"), Authorize(Roles = "Administrator, Owner, VPCD, Update area detail")]
     public async Task<IActionResult> update_area(int idArea, string name)
     {
         if (!ModelState.IsValid)
@@ -59,7 +91,7 @@ public class AreaController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpDelete("delete_area/{idArea}"), Authorize(Roles = "Administrator")]
+    [HttpDelete("delete_area/{idArea}"), Authorize(Roles = "Administrator, Owner, VPCD, Delete areas")]
     public async Task<IActionResult> delete_area(int idArea)
     {
         if (!ModelState.IsValid)

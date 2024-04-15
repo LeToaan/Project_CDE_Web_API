@@ -24,17 +24,17 @@ public class DistributorController : Controller
         positionTitleService= _positionTitleService;
     }
 
-    [Produces("application/json")]
+    /*[Produces("application/json")]
     [HttpGet("getPositionTitleDistributor")]
     public ActionResult<dynamic> getPositionDistributor()
     {
 
         return Ok(positionTitleService.getPosition_Title_Distributor());
-    }
+    }*/
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_distributor/{idArea}"), Authorize(Roles = "Administrator, Create new distributor")]
+    [HttpPost("create_distributor/{idArea}"), Authorize(Roles = "Administrator, Owner, Create new distributor")]
     public async Task<IActionResult> create_distributor(int idArea, [FromBody] DistributorDTO distributorDTO)
     {
         if (!ModelState.IsValid)
@@ -46,7 +46,7 @@ public class DistributorController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPut("update_distributor/{id}"), Authorize(Roles = "Administrator, Update detail distributor")]
+    [HttpPut("update_distributor/{id}"), Authorize(Roles = "Administrator, Owner, Update detail distributor")]
     public async Task<IActionResult> update_distributor([FromBody] DistributorUpdateDTO distributorDTO, int id)
     {
         if (!ModelState.IsValid)
@@ -58,7 +58,7 @@ public class DistributorController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpDelete("delete_distributor/{idDistributor}"), Authorize(Roles = "Administrator, Update detail distributor")]
+    [HttpDelete("delete_distributor/{idDistributor}"), Authorize(Roles = "Administrator, Owner, Update detail distributor")]
     public async Task<IActionResult> delete_distributor(int idDistributor)
     {
         if (!ModelState.IsValid)

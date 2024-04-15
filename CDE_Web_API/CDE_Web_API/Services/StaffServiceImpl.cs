@@ -337,6 +337,7 @@ public class StaffServiceImpl : StaffService
             var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
             user.Password = hashPassword;
             user.Created = DateTime.Now;
+            user.Reporter = accountLogin.Id.ToString();
             _dbContext.Accounts.Add(user);
             if (await _dbContext.SaveChangesAsync() > 0)
             {
@@ -513,6 +514,7 @@ public class StaffServiceImpl : StaffService
                     }
                 }
 
+                user_.PositionTitleId = accountSalesDTO.PositionTitleId;
                 user_.Inferior = inferior;
                 user_.Fullname = accountSalesDTO.Fullname;
                 user_.Email = accountSalesDTO.Email;

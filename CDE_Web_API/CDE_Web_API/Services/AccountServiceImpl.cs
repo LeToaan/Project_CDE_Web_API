@@ -71,7 +71,7 @@ public class AccountServiceImpl : AccountService
                 user.Password = hashPassword;
                 user.Status = true;
                 user.Created = DateTime.Now;
-
+                user.Reporter = _dbContext.Accounts.FirstOrDefault(a => a.Email == _authAccountService.getAccount()).Id.ToString();
                 
                  _dbContext.Accounts.Add(user);
                 if(await _dbContext.SaveChangesAsync() > 0)

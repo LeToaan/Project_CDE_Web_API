@@ -5,6 +5,7 @@ using CDE_Web_API.Helpers;
 using CDE_Web_API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CDE_Web_API.Services;
 
@@ -138,24 +139,209 @@ public class AreaServiceImpl : AreaService
         }
     }
 
-    public dynamic area_detail(int idArea)
+    public dynamic area_detail(int idArea, string? userKeyword)
     {
-        var user_area = _dbContext.Accounts.Where(a => a.AreaId == idArea).Select(account => new
+        var getLogin = _dbContext.Accounts.FirstOrDefault(a => a.Email == _authAccountService.getAccount());
+        if (getLogin == null)
         {
-            id = account.Id,
-            fullname = account.Fullname,
-            email = account.Email,
-            position = account.PositionTitle.Name,
-            address = account.Address,
-            phone = account.Phone,
-            superior = account.Superior.PositionTitle.Name,
-        }).ToList();
+            return new BadRequestObjectResult(new { msg = "Please, Login!" });
+        }
+        dynamic user_area = null;
+        if (getLogin.PositionTitle.Name.Equals("Administrator"))
+        {
+            user_area = _dbContext.Accounts.Where(a => a.AreaId == idArea).Select(account => new
+            {
+                Staff = _dbContext.Accounts.Where(s => 
+                !s.PositionTitle.PositionGroup.Name.Equals("System") &&
+                s.PositionTitle.PositionGroup.Name.Equals("Sales") && s.AreaId == idArea
+                ).Select(staff => new
+                {
+                    Id = staff.Id,
+                    Fullname = staff.Fullname,
+                    Positition = staff.PositionTitle.Name,
+                    Status = staff.Status
+                }).ToList(),
+                Distributor = _dbContext.Accounts.Where(s => s.PositionTitle.PositionGroup.Name.Equals("Distributor") && s.AreaId == idArea).Select(distributor => new
+                {
+                    Id = distributor.Id,
+                    Fullname = distributor.Fullname,
+                    Positition = distributor.PositionTitle.Name,
+                    Status = distributor.Status
+                }).ToList(),
+            }).FirstOrDefault();
 
-        if(user_area == null)
+            if (userKeyword != null)
+            {
+                if(userKeyword.IsNullOrEmpty())
+                {
+                    return user_area;
+                }else
+                {
+                    user_area = _dbContext.Accounts.Where(a => a.AreaId == idArea).Select(account => new
+                    {
+                        Staff = _dbContext.Accounts.Where(s =>
+                        !s.PositionTitle.PositionGroup.Name.Equals("System") &&
+                        s.PositionTitle.PositionGroup.Name.Equals("Sales") && 
+                        (s.Email.Contains(userKeyword) || s.Fullname.Contains(userKeyword))
+                        && s.AreaId == idArea
+                ).Select(staff => new
+                {
+                    Id = staff.Id,
+                    Fullname = staff.Fullname,
+                    Positition = staff.PositionTitle.Name,
+                    Status = staff.Status
+                }).ToList(),
+                        Distributor = _dbContext.Accounts.Where(s => s.PositionTitle.PositionGroup.Name.Equals("Distributor") &&
+                        (s.Email.Contains(userKeyword) || s.Fullname.Contains(userKeyword))
+                        && s.AreaId == idArea).Select(distributor => new
+                        {
+                            Id = distributor.Id,
+                            Fullname = distributor.Fullname,
+                            Positition = distributor.PositionTitle.Name,
+                            Status = distributor.Status
+                        }).ToList(),
+                    }).FirstOrDefault();
+                }
+            }
+        }
+        if (getLogin.PositionTitle.Name.Equals("VPCD"))
+        {
+            user_area = _dbContext.Accounts.Where(a => a.AreaId == idArea).Select(account => new
+            {
+                Staff = _dbContext.Accounts.Where(s => 
+                !s.PositionTitle.PositionGroup.Name.Equals("System") &&
+                s.PositionTitle.PositionGroup.Name.Equals("Sales") &&
+                !s.PositionTitle.Name.Equals("VPCD") && s.AreaId == idArea).Select(staff => new
+                {
+                    Id = staff.Id,
+                    Fullname = staff.Fullname,
+                    Positition = staff.PositionTitle.Name,
+                    Status = staff.Status
+                }).ToList(),
+                Distributor = _dbContext.Accounts.Where(d => d.PositionTitle.PositionGroup.Name.Equals("Distributor") && d.AreaId == idArea).Select(distributor => new
+                {
+                    Id = distributor.Id,
+                    Fullname = distributor.Fullname,
+                    Positition = distributor.PositionTitle.Name,
+                    Status = distributor.Status
+                }).ToList(),
+            }).FirstOrDefault();
+
+            if (userKeyword != null)
+            {
+                if (userKeyword.IsNullOrEmpty())
+                {
+                    return user_area;
+                }
+                else
+                {
+                    user_area = _dbContext.Accounts.Where(a => a.AreaId == idArea).Select(account => new
+                    {
+                        Staff = _dbContext.Accounts.Where(s =>
+                         !s.PositionTitle.PositionGroup.Name.Equals("System") &&
+                        s.PositionTitle.PositionGroup.Name.Equals("Sales") &&
+                        !s.PositionTitle.Name.Equals("VPCD") &&
+                        (s.Email.Contains(userKeyword) || s.Fullname.Contains(userKeyword) && s.AreaId == idArea)
+                ).Select(staff => new
+                {
+                    Id = staff.Id,
+                    Fullname = staff.Fullname,
+                    Positition = staff.PositionTitle.Name,
+                    Status = staff.Status
+                }).ToList(),
+                        Distributor = _dbContext.Accounts.Where(s => s.PositionTitle.PositionGroup.Name.Equals("Distributor") &&
+                        (s.Email.Contains(userKeyword) || s.Fullname.Contains(userKeyword)) && s.AreaId == idArea).Select(distributor => new
+                        {
+                            Id = distributor.Id,
+                            Fullname = distributor.Fullname,
+                            Positition = distributor.PositionTitle.Name,
+                            Status = distributor.Status
+                        }).ToList(),
+                    }).FirstOrDefault();
+                }
+            }
+        }
+
+
+        if (user_area == null)
         {
             return null;
         }
 
         return user_area;
+    }
+
+    public async Task<IActionResult> change_area(int idUser, int idArea)
+    {
+        try
+        {
+            var user = _dbContext.Accounts.FirstOrDefault(a => a.Id == idUser);
+            if(user == null) {
+                return new BadRequestObjectResult(new { msg = "User not found!" });
+            }
+            if(user.PositionTitle.Name.Equals("BAM") || user.PositionTitle.Name.Equals("ASM") ||
+                user.PositionTitle.Name.Equals("CE – Capability Executive") || 
+                user.PositionTitle.Name.Equals("Sale SUP – Sale Supervisor") ||
+                user.PositionTitle.Name.Equals("Distributor - OM/TL"))
+            {
+                var area = await _dbContext.Areas.FirstOrDefaultAsync(a => a.Id == idArea);
+                if(area == null)
+                {
+                    return new BadRequestObjectResult(new { msg = "Area not found!" });
+                }
+                user.AreaId = idArea;
+                _dbContext.Entry(user).State = EntityState.Modified;
+
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    return new OkObjectResult(new { result = "Change Area Success" });
+                }
+                else
+                {
+                    return new OkObjectResult(new { result = false });
+                }
+
+            }
+            else
+            {
+                return new BadRequestObjectResult(new { msg = "Just change staff!" });
+            }
+        }catch(Exception e)
+        {
+            return new BadRequestObjectResult(new {msg = e.Message});
+        }
+    }
+
+    public dynamic area_manager(string? areaSearch)
+    {
+            var area = _dbContext.Areas.Select(area => new
+                    {
+                        id = area.Id,
+                        areaCode = area.AreaCode,
+                        areaName = area.AreaName,
+                        distributorQuantity = _dbContext.Accounts.Where(a => a.AreaId == area.Id && a.PositionTitle.Name.Equals("Distributor - OM/TL")).Count(),
+                    }).ToList();
+        
+        if(areaSearch != null)
+        {
+            if (areaSearch.IsNullOrEmpty())
+            {
+                return area;
+            }else
+            {
+                area = _dbContext.Areas
+                .Where(a => a.AreaName.Contains(areaSearch) || a.AreaCode.Contains(areaSearch))
+                .Select(area => new
+                {
+                    id = area.Id,
+                    areaCode = area.AreaCode,
+                    areaName = area.AreaName,
+                    distributorQuantity = _dbContext.Accounts
+                        .Count(a => a.AreaId == area.Id && a.PositionTitle.Name.Contains("Distributor - OM/TL"))
+                })
+                .ToList();
+            }
+        }
+        return area;
     }
 }

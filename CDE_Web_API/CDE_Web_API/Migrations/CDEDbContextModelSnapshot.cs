@@ -40,7 +40,7 @@ namespace CDE_Web_API.Migrations
                     b.Property<DateTime?>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Reporter")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 

@@ -29,7 +29,7 @@ public class Account
     public string? Photo { get; set; }
 
     [MaxLength(250)]
-    public string? Description { get; set; }
+    public string? Reporter { get; set; }
 
     public bool? Status { get; set; }
 
@@ -47,6 +47,6 @@ public class Account
     public virtual Area? Area { get; set; }
     public int? PositionTitleId { get; set; }
     public virtual PositionTitle? PositionTitle { get; set; }
-
+    public Dictionary<int, Account> Reporters = new Dictionary<int, Account>();
     public Dictionary<int, Permission> Permissions = new Dictionary<int, Permission>();
 }

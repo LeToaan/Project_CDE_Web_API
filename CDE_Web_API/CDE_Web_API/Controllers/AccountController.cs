@@ -72,7 +72,7 @@ public class AccountController : ControllerBase
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpDelete("delete-user/{id}"), Authorize(Roles = "Administrator")]
+    [HttpDelete("delete-user/{id}"), Authorize(Roles = "Administrator, Owner")]
     public async Task<IActionResult> delete_user(int id)
     {
        

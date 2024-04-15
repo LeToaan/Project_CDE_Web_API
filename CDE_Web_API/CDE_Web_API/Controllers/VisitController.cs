@@ -24,7 +24,7 @@ public class VisitController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("create_visit"), Authorize(Roles = "Administrator")]
+    [HttpPost("create_visit"), Authorize(Roles = "Administrator, Owner, Create new visit plan")]
     public async Task<IActionResult> create_visit([FromBody] VisitDTO visitDTO)
     {
         if (!ModelState.IsValid)
@@ -35,7 +35,7 @@ public class VisitController : Controller
     }
 
     [Produces("application/json")]
-    [HttpGet("visit_detail/{id}")]
+    [HttpGet("visit_detail/{id}"), Authorize]
     public async Task<dynamic> visit_detail(int id)
     {
         return await visitService.visitDetail(id);

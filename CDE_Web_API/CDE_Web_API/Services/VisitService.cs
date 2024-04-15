@@ -12,4 +12,6 @@ public interface VisitService
     public dynamic getVisit();
 
     public Task<dynamic> visitDetail(int id);
+
+    public Task<dynamic> searchVisit(string? keyword);
 }
