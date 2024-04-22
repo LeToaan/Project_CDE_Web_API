@@ -33,7 +33,7 @@ public class AreaServiceImpl : AreaService
         _httpContextAccessor = httpContextAccessor;
         _authAccountService = authAccountService;
     }
-    public async Task<IActionResult> creater_area(AreaDTO areaDTO)
+    public async Task<IActionResult> Creater_area(AreaDTO areaDTO)
     {
         Area area = _mapper.Map<Area>(areaDTO);
         try
@@ -62,7 +62,7 @@ public class AreaServiceImpl : AreaService
         }
     }
 
-    public async Task<IActionResult> update_area(int idArea, string name)
+    public async Task<IActionResult> Update_area(int idArea, string name)
     {
         try
         {
@@ -106,7 +106,7 @@ public class AreaServiceImpl : AreaService
         }
     }
 
-    public async Task<IActionResult> delete_area(int idArea)
+    public async Task<IActionResult> Delete_area(int idArea)
     {
         try
         {
@@ -139,7 +139,7 @@ public class AreaServiceImpl : AreaService
         }
     }
 
-    public dynamic area_detail(int idArea, string? userKeyword)
+    public dynamic Area_detail(int idArea, string? userKeyword)
     {
         var getLogin = _dbContext.Accounts.FirstOrDefault(a => a.Email == _authAccountService.getAccount());
         if (getLogin == null)
@@ -158,6 +158,7 @@ public class AreaServiceImpl : AreaService
                 {
                     Id = staff.Id,
                     Fullname = staff.Fullname,
+                    Email = staff.Email,
                     Positition = staff.PositionTitle.Name,
                     Status = staff.Status
                 }).ToList(),
@@ -165,6 +166,7 @@ public class AreaServiceImpl : AreaService
                 {
                     Id = distributor.Id,
                     Fullname = distributor.Fullname,
+                    Email = distributor.Email,
                     Positition = distributor.PositionTitle.Name,
                     Status = distributor.Status
                 }).ToList(),
@@ -188,6 +190,7 @@ public class AreaServiceImpl : AreaService
                 {
                     Id = staff.Id,
                     Fullname = staff.Fullname,
+                    Email = staff.Email,
                     Positition = staff.PositionTitle.Name,
                     Status = staff.Status
                 }).ToList(),
@@ -197,6 +200,7 @@ public class AreaServiceImpl : AreaService
                         {
                             Id = distributor.Id,
                             Fullname = distributor.Fullname,
+                            Email = distributor.Email,
                             Positition = distributor.PositionTitle.Name,
                             Status = distributor.Status
                         }).ToList(),
@@ -215,6 +219,7 @@ public class AreaServiceImpl : AreaService
                 {
                     Id = staff.Id,
                     Fullname = staff.Fullname,
+                    Email = staff.Email,
                     Positition = staff.PositionTitle.Name,
                     Status = staff.Status
                 }).ToList(),
@@ -222,6 +227,7 @@ public class AreaServiceImpl : AreaService
                 {
                     Id = distributor.Id,
                     Fullname = distributor.Fullname,
+                    Email = distributor.Email,
                     Positition = distributor.PositionTitle.Name,
                     Status = distributor.Status
                 }).ToList(),
@@ -246,6 +252,7 @@ public class AreaServiceImpl : AreaService
                 {
                     Id = staff.Id,
                     Fullname = staff.Fullname,
+                    Email = staff.Email,
                     Positition = staff.PositionTitle.Name,
                     Status = staff.Status
                 }).ToList(),
@@ -254,6 +261,7 @@ public class AreaServiceImpl : AreaService
                         {
                             Id = distributor.Id,
                             Fullname = distributor.Fullname,
+                            Email = distributor.Email,
                             Positition = distributor.PositionTitle.Name,
                             Status = distributor.Status
                         }).ToList(),
@@ -271,7 +279,7 @@ public class AreaServiceImpl : AreaService
         return user_area;
     }
 
-    public async Task<IActionResult> change_area(int idUser, int idArea)
+    public async Task<IActionResult> Change_area(int idUser, int idArea)
     {
         try
         {
@@ -312,7 +320,7 @@ public class AreaServiceImpl : AreaService
         }
     }
 
-    public dynamic area_manager(string? areaSearch)
+    public dynamic Area_manager(string? areaSearch)
     {
             var area = _dbContext.Areas.Select(area => new
                     {

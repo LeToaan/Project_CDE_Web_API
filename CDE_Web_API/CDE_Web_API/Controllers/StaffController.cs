@@ -29,7 +29,7 @@ public class StaffController : ControllerBase
     public ActionResult<dynamic> GetStaff()
     {
         
-        return Ok(staffService.staff_manager());
+        return Ok(staffService.Staff_manager());
     }
 
     [Produces("application/json")]
@@ -49,7 +49,7 @@ public class StaffController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        return await staffService.creater_sales(idArea ,accountSalesDTO);
+        return await staffService.Creater_sales(idArea ,accountSalesDTO);
     }
 
     [Produces("application/json")]
@@ -61,7 +61,7 @@ public class StaffController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        return await staffService.update_sales(accountSalesDTO, id);
+        return await staffService.Update_sales(accountSalesDTO, id);
     }
 
     [Produces("application/json")]
@@ -70,6 +70,6 @@ public class StaffController : ControllerBase
     public async Task<IActionResult> delete_sales(int id)
     {
 
-        return await staffService.delete_sales(id);
+        return await staffService.Delete_sales(id);
     }
 }

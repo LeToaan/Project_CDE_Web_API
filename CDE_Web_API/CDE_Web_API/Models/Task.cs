@@ -12,9 +12,6 @@ public class Task
     [MaxLength(250)]
     public string Title { get; set; }
 
-    [MaxLength(250)]
-    public string? File { get; set; }
-
     [MaxLength(1000)]
     public string Description { get; set; }
 
@@ -23,7 +20,6 @@ public class Task
     [DisplayFormat(DataFormatString = "{yyyy-MM-dd}")]
     public DateTime? DateStart { get; set; }
 
-    [DisplayFormat(DataFormatString = "{yyyy-MM-dd}")]
     public DateTime? DateEnd { get; set; }
 
     [Required]

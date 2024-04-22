@@ -43,25 +43,49 @@ public class VisitServiceImpl : VisitService
         _authAccountService = authAccountService;
     }
 
-    public async Task<IActionResult> create_visit(VisitDTO visitDTO)
+    public async Task<IActionResult> Create_visit(VisitDTO visitDTO)
     {
-        Visit visit = _mapper.Map<Visit>(visitDTO);
+        Visit visit = new Visit();
         try
         {
-            var email = _authAccountService.getAccount();
-            var account = _dbContext.Accounts.FirstOrDefault(a => a.Email == email);
-            var distributor = await _dbContext.Distributors.FirstOrDefaultAsync(p => p.Id == visit.DistributorId);
-            if (!distributor.Account.PositionTitle.Name.Equals("Distributor - OM/TL") || distributor == null)
-            {
-                return new BadRequestObjectResult(new { msg = "Please, choose Distributor!" });
-            }
-         
+            var account = _dbContext.Accounts.FirstOrDefault(a => a.Email == _authAccountService.getAccount());
+            var distributor = await _dbContext.Distributors.FirstOrDefaultAsync(p => p.Id == visitDTO.DistributorId);
+            
+              if (!distributor.Account.PositionTitle.Name.Equals("Distributor - OM/TL") || distributor == null)
+                {
+                    return new BadRequestObjectResult(new { msg = "Please, choose Distributor!" });
+                }
+            visit.DistributorId = visitDTO.DistributorId;
+            visit.Time = visitDTO.Time;
+            visit.DateTime = visitDTO.DateTime;
+            visit.Intent = visitDTO.Intent;
             visit.Status = 1;
             visit.Creator = account.Id;
             _dbContext.Visits.Add(visit);
             if (await _dbContext.SaveChangesAsync() > 0)
             {
-                return new OkObjectResult(new { result = true });
+                    
+                    foreach (int g in visitDTO.Guest)
+                    {
+                    var guest = new GuestVisit();
+                    var checkGuest = await _dbContext.Accounts.FirstOrDefaultAsync(c => c.Id == g);
+                        if (checkGuest == null || !checkGuest.PositionTitle.PositionGroup.Name.Equals("Guest"))
+                        {
+                            return new BadRequestObjectResult(new { msg = "Please, choose Guest!" });
+                        }
+                        guest.GuestId = g;
+                        guest.VisitId = visit.Id;
+                        _dbContext.GuestVisits.Add(guest);
+                    }
+                    if(await _dbContext.SaveChangesAsync() > 0)
+                    {
+                        return new OkObjectResult(new { result = true });
+
+                    }else
+                    {
+                        return new OkObjectResult(new { result = false });
+                    }
+                
             }
             else
             {
@@ -76,7 +100,7 @@ public class VisitServiceImpl : VisitService
         }
     }
 
-    public dynamic getVisit()
+    public dynamic GetVisit()
     {
         var visit = _dbContext.Visits.Select( visit => new
         {
@@ -125,7 +149,7 @@ public class VisitServiceImpl : VisitService
         return visit;
     }
 
-    public async Task<dynamic> visitDetail(int id)
+    public async Task<dynamic> VisitDetail(int id)
     {
         if(await _dbContext.Visits.FindAsync(id) == null)
         {
@@ -152,13 +176,13 @@ public class VisitServiceImpl : VisitService
                         }).FirstOrDefault(),
                     }).FirstOrDefault(),
                 }).FirstOrDefault(),
-                guest = visit.Guest == null ? null : _dbContext.Accounts.Where(g => g.Id == visit.Guest).Select(guest => new
+                /*guest = visit.Guest == null ? null : _dbContext.Accounts.Where(g => g.Id == visit.Guest).Select(guest => new
                 {
                     guest.Id,
                     guest.Fullname,
                     guest.Email,
                     guest.Phone
-                }).FirstOrDefault(),
+                }).FirstOrDefault(),*/
                 task = _dbContext.Tasks.Where(t => t.VisitId == visit.Id).Select(task => new
                 {
                     id = task.Id,
@@ -188,7 +212,7 @@ public class VisitServiceImpl : VisitService
         
     }
 
-    public Task<dynamic> searchVisit(string? keyword)
+    public Task<dynamic> SearchVisit(string? keyword)
     {
         dynamic vistit_List = _dbContext.Tasks.Where(v => v.Title.Contains(keyword) ||
         v.Visit.Intent.Contains(keyword)
@@ -203,5 +227,46 @@ public class VisitServiceImpl : VisitService
             }
         }
         return vistit_List;
+    }
+
+    public dynamic VisitManager()
+    {
+        var accountLogin = _dbContext.Accounts.FirstOrDefault(a => a.Email == _authAccountService.getAccount());
+        dynamic visits = null;
+        if(accountLogin.PositionTitle.Name.Equals("Administrator") || accountLogin.PositionTitle.Name.Equals("Owner"))
+        {
+            visits = _dbContext.Visits.Where(v => v.Status == 1 || v.Status == 2).Select(visit => new
+            {
+                Id = visit.Id,
+                Distributor = visit.Distributor.Name,
+                Creator = _dbContext.Accounts.Where(a => a.Id == visit.Creator).Select(creator => new
+                {
+                    Id = creator.Id,
+                    Fullname = creator.Fullname,
+                    Position = creator.PositionTitle.Name
+                }).FirstOrDefault(),
+                Status = visit.Status == 1 ? "Moi" : "Dang Thuc Hien",
+                DateTime = visit.DateTime.ToString(),
+            }).OrderByDescending(visit => visit.DateTime).ToList();
+        }
+
+        if (accountLogin.PositionTitle.Name.Equals("VPCD"))
+        {
+            visits = _dbContext.Visits.Where(v => (v.Status == 1 || v.Status == 2) && v.Distributor.Account.AreaId == accountLogin.AreaId).Select(visit => new
+            {
+                Id = visit.Id,
+                Distributor = visit.Distributor.Name,
+                Creator = _dbContext.Accounts.Where(a => a.Id == visit.Creator).Select(creator => new
+                {
+                    Id = creator.Id,
+                    Fullname = creator.Fullname,
+                    Position = creator.PositionTitle.Name
+                }).FirstOrDefault(),
+                Status = visit.Status == 1 ? "Moi" : "Dang Thuc Hien",
+                DateTime = visit.DateTime.ToString(),
+            }).OrderByDescending(visit => visit.DateTime).ToList();
+        }
+
+        return visits;
     }
 }

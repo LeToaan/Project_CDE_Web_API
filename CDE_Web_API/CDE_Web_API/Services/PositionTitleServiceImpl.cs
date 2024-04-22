@@ -43,7 +43,7 @@ public class PositionTitleServiceImpl : PositionTitleService
         _authAccountService = authAccountService;
     }
 
-    public async Task<IActionResult> create_positionTitle(PositionTitleDTO PositionTitleDTO)
+    public async Task<IActionResult> Create_positionTitle(PositionTitleDTO PositionTitleDTO)
     {
         PositionTitle position_title = _mapper.Map<PositionTitle>(PositionTitleDTO);
         try

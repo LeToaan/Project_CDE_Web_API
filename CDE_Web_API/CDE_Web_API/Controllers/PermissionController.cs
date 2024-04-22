@@ -35,6 +35,6 @@ public class PermissionController : ControllerBase
     public async Task<IActionResult> setPermission(int idUser, [FromBody] PermissionAccountDTO permissions)
     {
 
-        return await permissionService.setPermission(idUser, permissions);
+        return await permissionService.SetPermission(idUser, permissions);
     }
 }

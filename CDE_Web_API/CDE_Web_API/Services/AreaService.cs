@@ -5,11 +5,11 @@ namespace CDE_Web_API.Services;
 
 public interface AreaService
 {
-    public dynamic area_manager(string? areaSearch);
-    public dynamic area_detail(int idArea, string? userKeyword);
-    public Task<IActionResult> creater_area(AreaDTO areaDTO);
-    public Task<IActionResult> update_area(int idArea, string name);
-    public Task<IActionResult> delete_area(int idArea);
-    public Task<IActionResult> change_area(int idUser, int idArea);
+    public dynamic Area_manager(string? areaSearch);
+    public dynamic Area_detail(int idArea, string? userKeyword);
+    public Task<IActionResult> Creater_area(AreaDTO areaDTO);
+    public Task<IActionResult> Update_area(int idArea, string name);
+    public Task<IActionResult> Delete_area(int idArea);
+    public Task<IActionResult> Change_area(int idUser, int idArea);
 
 }

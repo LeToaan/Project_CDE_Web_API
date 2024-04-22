@@ -23,6 +23,13 @@ public class VisitController : Controller
     }
 
     [Produces("application/json")]
+    [HttpGet("visit"), Authorize]
+    public dynamic Visit()
+    {
+        return visitService.VisitManager();
+    }
+
+    [Produces("application/json")]
     [Consumes("application/json")]
     [HttpPost("create_visit"), Authorize(Roles = "Administrator, Owner, Create new visit plan")]
     public async Task<IActionResult> create_visit([FromBody] VisitDTO visitDTO)
@@ -31,13 +38,13 @@ public class VisitController : Controller
         {
             return BadRequest(ModelState);
         }
-        return await visitService.create_visit(visitDTO);
+        return await visitService.Create_visit(visitDTO);
     }
 
     [Produces("application/json")]
     [HttpGet("visit_detail/{id}"), Authorize]
     public async Task<dynamic> visit_detail(int id)
     {
-        return await visitService.visitDetail(id);
+        return await visitService.VisitDetail(id);
     }
 }

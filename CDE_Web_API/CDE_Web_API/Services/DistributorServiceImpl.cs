@@ -42,12 +42,13 @@ public class DistributorServiceImpl : DistributorService
         _httpContextAccessor = httpContextAccessor;
         _authAccountService = authAccountService;
     }
-    public async Task<IActionResult> creater_distriburot(int idArea,DistributorDTO distributorDTO)
+    public async Task<IActionResult> Creater_distriburot(int idArea,DistributorDTO distributorDTO)
     {
 
         Distributor distributor = new Distributor();
         try
         {
+            var accountLogin = _dbContext.Accounts.FirstOrDefault(a => a.Email == _authAccountService.getAccount());
             var areaExist = _dbContext.Areas.FirstOrDefault(a => a.Id == idArea);
             if (areaExist == null)
             {
@@ -70,6 +71,7 @@ public class DistributorServiceImpl : DistributorService
             account.Address = distributorDTO.Address;
             account.Status = distributorDTO.Status;
             account.Created = DateTime.Now;
+            account.Reporter = accountLogin.Id;
             account.PositionTitleId = 10;
             account.AreaId = idArea;
 
@@ -78,7 +80,7 @@ public class DistributorServiceImpl : DistributorService
             {
                 return new BadRequestObjectResult(new { msg = "Sale Management not found!" });
             }
-            if (salesMangement.PositionTitle.PositionGroup.Name.Equals("System") || salesMangement.PositionTitle.PositionGroup.Name.Equals("VPCD"))
+            if (salesMangement.PositionTitle.PositionGroup.Name.Equals("System"))
             {
                 return new BadRequestObjectResult(new { msg = "Sale Management Invalid!" });
             }
@@ -96,26 +98,25 @@ public class DistributorServiceImpl : DistributorService
                 {
                     return new BadRequestObjectResult(new { msg = "User " + user_sale.Id + " not exisit!" });
                 }
-                if (!user_sale.PositionTitle.PositionGroup.Name.Equals("Distributor") ||
-                    !user_sale.PositionTitle.PositionGroup.Name.Equals("Distributor - OM/TL"))
+                if (!user_sale.PositionTitle.Name.Equals("Sale SUP – Sale Supervisor"))
                 {
-                    return new BadRequestObjectResult(new { msg = "Position user " + user_sale.Id + " Invalid!" });
+                    return new BadRequestObjectResult(new { msg = "Sales just sale SUP – Sale Supervisor!" });
                 }
             }
 
             _dbContext.Accounts.Add(account);
+            
             if (await _dbContext.SaveChangesAsync() > 0)
             {
-                
                 distributor.AccountId = account.Id;
                 distributor.Name = distributorDTO.Name;
+                distributor.Email = distributorDTO.Email;
                 distributor.Address = distributorDTO.Address;
                 distributor.Phone = distributorDTO.Phone;
                 distributor.SaleManagement = distributorDTO.SaleManagement;
                 distributor.Sales = sales;
                 distributor.Status = distributorDTO.Status;
                 _dbContext.Distributors.Add(distributor);
-                
                 await _dbContext.SaveChangesAsync();
                 var mailHelper = new MailHelper(_configuration);
                 mailHelper.Send(_configuration["Gmail:Username"], account.Email,
@@ -135,7 +136,7 @@ public class DistributorServiceImpl : DistributorService
         }
     }
 
-    public async Task<IActionResult> update_distriburot(DistributorUpdateDTO distributorDTO, int id)
+    public async Task<IActionResult> Update_distriburot(DistributorUpdateDTO distributorDTO, int id)
     {
 
         try
@@ -175,10 +176,10 @@ public class DistributorServiceImpl : DistributorService
                     {
                         return new BadRequestObjectResult(new { msg = "User " + user_sale.Id + " not exisit!" });
                     }
-                    if (!user_sale.PositionTitle.PositionGroup.Name.Equals("Distributor") || 
-                        !user_sale.PositionTitle.PositionGroup.Name.Equals("Distributor - OM/TL"))
+                    if (
+                        !user_sale.PositionTitle.PositionGroup.Name.Equals("Sale SUP – Sale Supervisor"))
                     {
-                        return new BadRequestObjectResult(new { msg = "Position user " + user_sale.Id + " Invalid!" });
+                        return new BadRequestObjectResult(new { msg = "Just sale SUP – Sale Supervisor!" });
                     }
                 }
                 distributor_find.Name = distributorDTO.Name;
@@ -213,7 +214,7 @@ public class DistributorServiceImpl : DistributorService
         }
     }
 
-    public async Task<IActionResult> delete_distriburot(int idDistributor)
+    public async Task<IActionResult> Delete_distriburot(int idDistributor)
     {
         try
         {
@@ -253,15 +254,10 @@ public class DistributorServiceImpl : DistributorService
                     }
                 }
             }
-
-           
-
             _dbContext.Distributors.Remove(distributor);
             _dbContext.Accounts.Remove(distributor.Account);
             if (await _dbContext.SaveChangesAsync() > 0)
             {
-               
-
                 return new OkObjectResult(new { msg = "Delete Success" });
             } else { 
                 return new BadRequestObjectResult(new { msg = "Delete Failed!" });}

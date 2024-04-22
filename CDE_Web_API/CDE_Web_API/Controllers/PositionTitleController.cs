@@ -30,7 +30,7 @@ public class PositionTitleController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        return await positionTitleService.create_positionTitle(positionTitleDTO);
+        return await positionTitleService.Create_positionTitle(positionTitleDTO);
     }
 
 }

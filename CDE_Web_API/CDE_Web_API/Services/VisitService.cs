@@ -5,13 +5,12 @@ namespace CDE_Web_API.Services;
 
 public interface VisitService
 {
- 
+    public dynamic VisitManager();
+    public Task<IActionResult> Create_visit(VisitDTO visitDTO);
 
-    public Task<IActionResult> create_visit(VisitDTO visitDTO);
+    public dynamic GetVisit();
 
-    public dynamic getVisit();
+    public Task<dynamic> VisitDetail(int id);
 
-    public Task<dynamic> visitDetail(int id);
-
-    public Task<dynamic> searchVisit(string? keyword);
+    public Task<dynamic> SearchVisit(string? keyword);
 }

@@ -30,7 +30,7 @@ public class TaskController : Controller
     public ActionResult<dynamic> getVisit()
     {
 
-        return Ok(visitService.getVisit());
+        return Ok(visitService.GetVisit());
     }
 
     [Produces("application/json")]
@@ -42,6 +42,6 @@ public class TaskController : Controller
         {
             return BadRequest(ModelState);
         }
-        return await taskService.create_task(taskDTO, id);
+        return await taskService.Create_task(taskDTO, id);
     }
 }

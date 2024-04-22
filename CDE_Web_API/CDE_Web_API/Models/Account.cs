@@ -27,10 +27,7 @@ public class Account
 
     [MaxLength(250)]
     public string? Photo { get; set; }
-
-    [MaxLength(250)]
-    public string? Reporter { get; set; }
-
+    public int? Reporter { get; set; }
     public bool? Status { get; set; }
 
     public DateTime? Created { get; set; }

@@ -37,7 +37,7 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> forgetPassword(string email)
     {
 
-        return await accountService.forget_password(email);
+        return await accountService.Forget_password(email);
     }
 
     [Produces("application/json")]
@@ -49,7 +49,7 @@ public class AccountController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        return await accountService.reset_password(code, resetPasswordDTO);
+        return await accountService.Reset_password(code, resetPasswordDTO);
     }
 
     [Produces("application/json")]
@@ -58,7 +58,7 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> create_user([FromBody] AccountDTO accountDTO)
     {
        
-        return await accountService.register(accountDTO);
+        return await accountService.Register(accountDTO);
     }
 
     [Produces("application/json")]
@@ -67,7 +67,7 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> update_user([FromBody] AccountDTO accountDTO, int id)
     {
         
-        return await accountService.update_user(accountDTO, id);
+        return await accountService.Update_user(accountDTO, id);
     }
 
     [Produces("application/json")]
@@ -76,7 +76,7 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> delete_user(int id)
     {
        
-        return await accountService.delete_user(id);
+        return await accountService.Delete_user(id);
     }
 
    

@@ -41,7 +41,7 @@ public class DistributorController : Controller
         {
             return BadRequest(ModelState);
         }
-        return await distributorService.creater_distriburot(idArea, distributorDTO);
+        return await distributorService.Creater_distriburot(idArea, distributorDTO);
     }
 
     [Produces("application/json")]
@@ -53,7 +53,7 @@ public class DistributorController : Controller
         {
             return BadRequest(ModelState);
         }
-        return await distributorService.update_distriburot(distributorDTO, id);
+        return await distributorService.Update_distriburot(distributorDTO, id);
     }
 
     [Produces("application/json")]
@@ -65,6 +65,6 @@ public class DistributorController : Controller
         {
             return BadRequest(ModelState);
         }
-        return await distributorService.delete_distriburot(idDistributor);
+        return await distributorService.Delete_distriburot(idDistributor);
     }
 }

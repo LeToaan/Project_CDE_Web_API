@@ -47,7 +47,7 @@ public class StaffServiceImpl : StaffService
         _authAccountService = authAccountService;
     }
 
-    public dynamic staff_manager()
+    public dynamic Staff_manager()
     {
         var getLogin =  _dbContext.Accounts.FirstOrDefault(a => a.Email == _authAccountService.getAccount());
         var position_title =  _dbContext.PositionTitles.FirstOrDefault(p => p.Id == getLogin.PositionTitleId);
@@ -189,7 +189,7 @@ public class StaffServiceImpl : StaffService
         return staff;
     }
 
-    public async Task<IActionResult> creater_sales(int idArea, AccountSalesDTO accountSalesDTO)
+    public async Task<IActionResult> Creater_sales(int idArea, AccountSalesDTO accountSalesDTO)
     {
         Account user = new Account();
         try
@@ -337,7 +337,7 @@ public class StaffServiceImpl : StaffService
             var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
             user.Password = hashPassword;
             user.Created = DateTime.Now;
-            user.Reporter = accountLogin.Id.ToString();
+            user.Reporter = accountLogin.Id;
             _dbContext.Accounts.Add(user);
             if (await _dbContext.SaveChangesAsync() > 0)
             {
@@ -359,7 +359,7 @@ public class StaffServiceImpl : StaffService
         }
     }
 
-    public async Task<IActionResult> update_sales(AccountSalesUpdateDTO accountSalesDTO, int id)
+    public async Task<IActionResult> Update_sales(AccountSalesUpdateDTO accountSalesDTO, int id)
     {
         try
         {
@@ -542,7 +542,7 @@ public class StaffServiceImpl : StaffService
         }
     }
 
-    public async Task<IActionResult> delete_sales(int id)
+    public async Task<IActionResult> Delete_sales(int id)
     {
         try
         {

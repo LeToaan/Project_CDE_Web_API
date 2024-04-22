@@ -5,9 +5,9 @@ namespace CDE_Web_API.Services;
 
 public interface AccountService
 {
-    public Task<IActionResult> register(AccountDTO accountDTO);
-    public Task<IActionResult> update_user(AccountDTO accountDTO, int id);
-    public Task<IActionResult> delete_user(int id);
-    public Task<IActionResult> forget_password(string email);
-    public Task<IActionResult> reset_password(string code, ResetPasswordDTO resetPasswordDTO);
+    public Task<IActionResult> Register(AccountDTO accountDTO);
+    public Task<IActionResult> Update_user(AccountDTO accountDTO, int id);
+    public Task<IActionResult> Delete_user(int id);
+    public Task<IActionResult> Forget_password(string email);
+    public Task<IActionResult> Reset_password(string code, ResetPasswordDTO resetPasswordDTO);
 }

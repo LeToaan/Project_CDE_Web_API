@@ -78,5 +78,6 @@ public class AutoMapperProfile : Profile
         CreateMap<Visit, VisitDTO>();
         CreateMap<VisitDTO, Visit>();
 
+        
     }
 }

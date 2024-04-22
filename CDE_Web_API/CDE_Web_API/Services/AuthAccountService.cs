@@ -6,7 +6,6 @@ namespace CDE_Web_API.Services;
 
 public interface AuthAccountService
 {
-    public Task<IActionResult> register(AccountDTO accountDTO);
     public Task<IActionResult> Login(AccountLoginDTO accountDTO);
     public string getAccount();
     public dynamic getAccountSystems();

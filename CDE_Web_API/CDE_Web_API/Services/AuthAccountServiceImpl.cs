@@ -37,11 +37,6 @@ public class AuthAccountServiceImpl : AuthAccountService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public Task<IActionResult> register(AccountDTO accountDTO)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<IActionResult> Login(AccountLoginDTO accountDTO)
     {
         try

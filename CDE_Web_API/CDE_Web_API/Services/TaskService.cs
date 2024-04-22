@@ -5,8 +5,7 @@ namespace CDE_Web_API.Services;
 
 public interface TaskService
 {
- 
-
-    public Task<IActionResult> create_task(TaskDTO taskDTO, int id);
+    public dynamic Task();
+    public Task<IActionResult> Create_task(TaskDTO taskDTO, int id);
 
 }

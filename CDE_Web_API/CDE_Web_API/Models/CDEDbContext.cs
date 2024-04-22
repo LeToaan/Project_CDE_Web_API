@@ -29,6 +29,8 @@ public class CDEDbContext : DbContext
     public DbSet<Answer> Answers { get; set; }
     public DbSet<Rate> Rates { get; set; }
     public DbSet<CMS> CMSs { get; set; }
+    public DbSet<FileTask> FileTasks { get; set; }
+    public DbSet<GuestVisit> GuestVisits { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -55,7 +57,11 @@ public class CDEDbContext : DbContext
             .WithMany()
             .HasForeignKey(t => t.Id)
             .OnDelete(DeleteBehavior.NoAction);
-
+        modelBuilder.Entity<GuestVisit>()
+            .HasOne<Visit>(t => t.Visit)
+            .WithMany()
+            .HasForeignKey(t => t.VisitId)
+            .OnDelete(DeleteBehavior.NoAction);
         base.OnModelCreating(modelBuilder);
     }
 }

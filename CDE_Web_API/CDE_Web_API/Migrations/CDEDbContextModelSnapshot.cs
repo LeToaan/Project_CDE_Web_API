@@ -40,10 +40,6 @@ namespace CDE_Web_API.Migrations
                     b.Property<DateTime?>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Reporter")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
                     b.Property<string>("DistributorId")
                         .HasColumnType("nvarchar(max)");
 
@@ -76,6 +72,9 @@ namespace CDE_Web_API.Migrations
                         .HasColumnType("nvarchar(250)");
 
                     b.Property<int?>("PositionTitleId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Reporter")
                         .HasColumnType("int");
 
                     b.Property<bool?>("Status")
@@ -254,6 +253,63 @@ namespace CDE_Web_API.Migrations
                     b.ToTable("Distributors");
                 });
 
+            modelBuilder.Entity("CDE_Web_API.Models.FileTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Implementer")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Reporter")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("FileTasks");
+                });
+
+            modelBuilder.Entity("CDE_Web_API.Models.GuestVisit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("GuestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("Refuse")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("VisitId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuestId");
+
+                    b.HasIndex("VisitId");
+
+                    b.ToTable("GuestVisits");
+                });
+
             modelBuilder.Entity("CDE_Web_API.Models.Media", b =>
                 {
                     b.Property<int>("Id")
@@ -426,8 +482,7 @@ namespace CDE_Web_API.Migrations
 
                     b.Property<string>("Comment")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("Created")
                         .HasColumnType("datetime2");
@@ -435,10 +490,10 @@ namespace CDE_Web_API.Migrations
                     b.Property<short?>("RateValue")
                         .HasColumnType("smallint");
 
-                    b.Property<int>("Rater")
+                    b.Property<int>("RaterAccountId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RaterAccountId")
+                    b.Property<int>("RaterId")
                         .HasColumnType("int");
 
                     b.Property<int>("TaskId")
@@ -530,10 +585,6 @@ namespace CDE_Web_API.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("File")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
                     b.Property<int?>("Implement")
                         .IsRequired()
                         .HasColumnType("int");
@@ -622,10 +673,8 @@ namespace CDE_Web_API.Migrations
                     b.Property<DateTime?>("DateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DistributorId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Guest")
+                    b.Property<int?>("DistributorId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("Intent")
@@ -698,6 +747,36 @@ namespace CDE_Web_API.Migrations
                         .IsRequired();
 
                     b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("CDE_Web_API.Models.FileTask", b =>
+                {
+                    b.HasOne("CDE_Web_API.Models.Task", "Task")
+                        .WithMany()
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("CDE_Web_API.Models.GuestVisit", b =>
+                {
+                    b.HasOne("CDE_Web_API.Models.Account", "Guest")
+                        .WithMany()
+                        .HasForeignKey("GuestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CDE_Web_API.Models.Visit", "Visit")
+                        .WithMany()
+                        .HasForeignKey("VisitId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Guest");
+
+                    b.Navigation("Visit");
                 });
 
             modelBuilder.Entity("CDE_Web_API.Models.NotifiUser", b =>

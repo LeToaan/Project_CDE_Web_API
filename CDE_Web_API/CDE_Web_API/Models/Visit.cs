@@ -10,23 +10,14 @@ public class Visit
     public int Id { get; set; }
 
     public short? Time { get; set; }
-
-    [DisplayFormat(DataFormatString = "{yyyy-MM-dd}")]
     public DateTime? DateTime { get; set; }
-
     [MaxLength(250)]
     public string Intent { get; set; }
-
     public short? Status { get; set; }
-
     [Required]
     public int Creator { get; set; }
-
-    public int? Guest { get; set; }
-
     [Required]
-    public int DistributorId { get; set; }
-    public virtual Distributor Distributor { get; set; }
-
-    
+    public int? DistributorId { get; set; }
+    public virtual Distributor? Distributor { get; set; }
+    public Dictionary<int, GuestVisit> GuestVisits = new Dictionary<int, GuestVisit>();
 }

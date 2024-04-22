@@ -46,7 +46,7 @@ public class PermissionServiceImpl : PermissionService
         _authAccountService = authAccountService;
     }
 
-    public dynamic getPermission()
+    public dynamic GetPermission()
     {
         var permission = _dbContext.Permissions.Select(permission => new
         {
@@ -61,7 +61,7 @@ public class PermissionServiceImpl : PermissionService
         return permission;
     }
 
-    public async Task<IActionResult> setPermission(int id, PermissionAccountDTO permissions)
+    public async Task<IActionResult> SetPermission(int id, PermissionAccountDTO permissions)
     {
         
         try

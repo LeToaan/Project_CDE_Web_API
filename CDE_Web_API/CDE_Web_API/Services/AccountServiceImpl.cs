@@ -46,7 +46,7 @@ public class AccountServiceImpl : AccountService
         _authAccountService = authAccountService;
     }
 
-    public async Task<IActionResult> register(AccountDTO accountDTO)
+    public async Task<IActionResult> Register(AccountDTO accountDTO)
     {
         Account user = _mapper.Map<Account>(accountDTO);
         try
@@ -71,7 +71,7 @@ public class AccountServiceImpl : AccountService
                 user.Password = hashPassword;
                 user.Status = true;
                 user.Created = DateTime.Now;
-                user.Reporter = _dbContext.Accounts.FirstOrDefault(a => a.Email == _authAccountService.getAccount()).Id.ToString();
+                user.Reporter = _dbContext.Accounts.FirstOrDefault(a => a.Email == _authAccountService.getAccount()).Id;
                 
                  _dbContext.Accounts.Add(user);
                 if(await _dbContext.SaveChangesAsync() > 0)
@@ -95,7 +95,7 @@ public class AccountServiceImpl : AccountService
     }
 
 
-    public async Task<IActionResult> update_user(AccountDTO accountDTO, int id)
+    public async Task<IActionResult> Update_user(AccountDTO accountDTO, int id)
     {
         Account user = _mapper.Map<Account>(accountDTO);
          try
@@ -137,7 +137,7 @@ public class AccountServiceImpl : AccountService
 
    
 
-    public async Task<IActionResult> forget_password(string email)
+    public async Task<IActionResult> Forget_password(string email)
     {
         var user = await _dbContext.Accounts.FirstOrDefaultAsync(u => u.Email == email);
         if(user == null)
@@ -181,7 +181,7 @@ public class AccountServiceImpl : AccountService
 
     
 
-    public async Task<IActionResult> reset_password(string code,ResetPasswordDTO resetPasswordDTO)
+    public async Task<IActionResult> Reset_password(string code,ResetPasswordDTO resetPasswordDTO)
     {
         try
         {
@@ -213,7 +213,7 @@ public class AccountServiceImpl : AccountService
         
     }
 
-    public async Task<IActionResult> delete_user(int id)
+    public async Task<IActionResult> Delete_user(int id)
     {
         try
         {

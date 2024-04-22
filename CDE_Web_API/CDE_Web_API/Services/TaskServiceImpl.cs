@@ -43,7 +43,7 @@ public class TaskServiceImpl : TaskService
         _authAccountService = authAccountService;
     }
 
-    public async Task<IActionResult> create_task(TaskDTO taskDTO, int id)
+    public async Task<IActionResult> Create_task(TaskDTO taskDTO, int id)
     {
         Models.Task task = _mapper.Map<Models.Task>(taskDTO);
         try
@@ -81,5 +81,10 @@ public class TaskServiceImpl : TaskService
         {
             return new BadRequestObjectResult(new { msg = ex.Message });
         }
+    }
+
+    public dynamic Task()
+    {
+        throw new NotImplementedException();
     }
 }

@@ -29,7 +29,7 @@ public class AreaController : Controller
         {
             return BadRequest(ModelState);
         }
-        return areaService.area_manager(null);
+        return areaService.Area_manager(null);
     }
     [Produces("application/json")]
     [HttpGet("area-search/areaKeyword"), Authorize(Roles = "Administrator, Owner, VPCD")]
@@ -39,7 +39,7 @@ public class AreaController : Controller
         {
             return BadRequest(ModelState);
         }
-        return areaService.area_manager(areaKeyword);
+        return areaService.Area_manager(areaKeyword);
     }
 
     [Produces("application/json")]
@@ -50,7 +50,7 @@ public class AreaController : Controller
         {
             return BadRequest(ModelState);
         }
-        return areaService.area_detail(idArea, null);
+        return areaService.Area_detail(idArea, null);
     }
 
     [Produces("application/json")]
@@ -61,7 +61,7 @@ public class AreaController : Controller
         {
             return BadRequest(ModelState);
         }
-        return areaService.area_detail(idArea, userKeyword);
+        return areaService.Area_detail(idArea, userKeyword);
     }
 
     [Produces("application/json")]
@@ -73,7 +73,7 @@ public class AreaController : Controller
         {
             return BadRequest(ModelState);
         }
-        return await areaService.creater_area(areaDTO);
+        return await areaService.Creater_area(areaDTO);
     }
 
 
@@ -86,7 +86,7 @@ public class AreaController : Controller
         {
             return BadRequest(ModelState);
         }
-        return await areaService.update_area(idArea, name);
+        return await areaService.Update_area(idArea, name);
     }
 
     [Produces("application/json")]
@@ -98,6 +98,6 @@ public class AreaController : Controller
         {
             return BadRequest(ModelState);
         }
-        return await areaService.delete_area(idArea);
+        return await areaService.Delete_area(idArea);
     }
 }
