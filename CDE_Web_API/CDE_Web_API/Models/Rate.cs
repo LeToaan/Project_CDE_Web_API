@@ -12,9 +12,9 @@ public class Rate
     public string Comment { get; set; }
     public DateTime? Created { get; set; }
     [Required]
-    public int RaterId { get; set; }
-    public virtual Account RaterAccount { get; set; }
+    public int RaterAccountId { get; set; }
+    public virtual Account? RaterAccount { get; set; }
     [Required]
     public int TaskId { get; set; }
-    public virtual Task Task { get; set; }
+    public virtual Task? Task { get; set; }
 }

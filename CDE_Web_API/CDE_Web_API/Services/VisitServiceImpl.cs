@@ -156,7 +156,8 @@ public class VisitServiceImpl : VisitService
             return new BadRequestObjectResult(new { msg = "Visit not exists!" });
         }else
         {
-            var visit = _dbContext.Visits.Where(v => v.Id == id).Select( visit => new
+           
+            var visit = _dbContext.Visits.Where(v => v.Id == id).Select(visit => new
             {
                 id = visit.Id,
                 time = visit.Time == 1 ? "Morning" : visit.Time == 2 ? "Afternoon" : "All day",
@@ -176,13 +177,15 @@ public class VisitServiceImpl : VisitService
                         }).FirstOrDefault(),
                     }).FirstOrDefault(),
                 }).FirstOrDefault(),
-                /*guest = visit.Guest == null ? null : _dbContext.Accounts.Where(g => g.Id == visit.Guest).Select(guest => new
-                {
-                    guest.Id,
-                    guest.Fullname,
-                    guest.Email,
-                    guest.Phone
-                }).FirstOrDefault(),*/
+                guestRefused = _dbContext.GuestVisits
+                                .Where(g => g.VisitId == visit.Id && g.Refuse == true)
+                                .Select(guest => new
+                                {
+                                    guest.Guest.Email,
+                                    guest.Guest.Fullname,
+                                    Reason = guest
+                                })
+                                .ToList(),
                 task = _dbContext.Tasks.Where(t => t.VisitId == visit.Id).Select(task => new
                 {
                     id = task.Id,
@@ -268,5 +271,54 @@ public class VisitServiceImpl : VisitService
         }
 
         return visits;
+    }
+
+    public dynamic VitsitHistory()
+    {
+        try
+        {
+            var accountLogin = _dbContext.Accounts.FirstOrDefault(a => a.Email == _authAccountService.getAccount());
+            dynamic visits = null;
+            if (accountLogin.PositionTitle.Name.Equals("Owner") || accountLogin.PositionTitle.Name.Equals("Administrator"))
+            {
+                                visits = _dbContext.Visits.Where(v => v.DateTime <= DateTime.Now && (v.Status == 2 || v.Status == 3)).Select(visit => new
+                {
+                    Id = visit.Id,
+                    Distributor = visit.Distributor.Name,
+                    Intent = visit.Intent,
+                    Creator = _dbContext.Accounts.Where(a => a.Id == visit.Creator).Select(creator => new
+                    {
+                        Id = creator.Id,
+                        Fullname = creator.Fullname,
+                        Position = creator.PositionTitle.Name
+                    }).FirstOrDefault(),
+                    Status = visit.Status == 2 ? "Da Thuc Hien" : "Da Huy",
+                    DateTime = visit.DateTime.ToString(),
+                }).OrderByDescending(visit => visit.DateTime).ToList();
+            }
+            else
+            {
+                
+                visits = _dbContext.Visits.Where(v => v.DateTime <= DateTime.Now && (v.Status == 2 || v.Status == 3) && v.Distributor.Account.AreaId == accountLogin.AreaId).Select(visit => new
+                {
+                    Id = visit.Id,
+                    Distributor = visit.Distributor.Name,
+                    Intent = visit.Intent,
+                    Creator = _dbContext.Accounts.Where(a => a.Id == visit.Creator).Select(creator => new
+                    {
+                        Id = creator.Id,
+                        Fullname = creator.Fullname,
+                        Position = creator.PositionTitle.Name
+                    }).FirstOrDefault(),
+                    Status = visit.Status == 2 ? "Da Thuc Hien" : "Da Huy",
+                    DateTime = visit.DateTime.ToString(),
+                }).OrderByDescending(visit => visit.DateTime).ToList();
+            }
+            return visits;
+        }
+        catch(Exception ex)
+        {
+            return ex.Message;
+        }
     }
 }

@@ -63,6 +63,8 @@ public class AutoMapperProfile : Profile
         CreateMap<PositionTitleDTO, PositionTitle>();
 
         CreateMap<Rate, RateDTO>();
+        CreateMap<RateDTO, Rate>();
+
 
         CreateMap<SurveyDetail, SurveyDetailDTO>();
 

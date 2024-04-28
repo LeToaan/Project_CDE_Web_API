@@ -6,6 +6,7 @@ namespace CDE_Web_API.Services;
 public interface VisitService
 {
     public dynamic VisitManager();
+    public dynamic VitsitHistory();
     public Task<IActionResult> Create_visit(VisitDTO visitDTO);
 
     public dynamic GetVisit();

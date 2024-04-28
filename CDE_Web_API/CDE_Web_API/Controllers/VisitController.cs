@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace CDE_Web_API.Controllers;
-[Route("api/[controller]")]
+[Route("api/[controller]"), Authorize]
 [ApiController]
 public class VisitController : Controller
 {
@@ -23,10 +23,17 @@ public class VisitController : Controller
     }
 
     [Produces("application/json")]
-    [HttpGet("visit"), Authorize]
+    [HttpGet("visit")]
     public dynamic Visit()
     {
         return visitService.VisitManager();
+    }
+
+    [Produces("application/json")]
+    [HttpGet("visit-history")]
+    public dynamic VisitHistory()
+    {
+        return visitService.VitsitHistory();
     }
 
     [Produces("application/json")]
@@ -42,7 +49,7 @@ public class VisitController : Controller
     }
 
     [Produces("application/json")]
-    [HttpGet("visit_detail/{id}"), Authorize]
+    [HttpGet("visit_detail/{id}")]
     public async Task<dynamic> visit_detail(int id)
     {
         return await visitService.VisitDetail(id);

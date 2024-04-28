@@ -8,6 +8,7 @@ using System.Data;
 namespace CDE_Web_API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class TaskController : Controller
 {
     private TaskService taskService;
@@ -43,5 +44,41 @@ public class TaskController : Controller
             return BadRequest(ModelState);
         }
         return await taskService.Create_task(taskDTO, id);
+    }
+
+    [Consumes("multipart/form-data")]
+    [Produces("application/json")]
+    [HttpPut("upload-files-task/{idTask}")]
+    public async Task<IActionResult> UploadFilesTask(int idTask, List<IFormFile> filesReporter, List<IFormFile> filesImplement)
+    {
+        return await taskService.Uploads_files(idTask, filesReporter, filesImplement);
+    }
+
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [HttpPost("comment_task/{idTask}")]
+    public async Task<IActionResult> comment_task(int idTask,[FromBody] RateDTO rateDTO)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return await taskService.CommentTask(idTask, rateDTO);
+    }
+
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [HttpPut("close-task/{idTask}")]
+    public async Task<IActionResult> CloseTask(int idTask)
+    {
+        return await taskService.ClostTask(idTask);
+    }
+
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [HttpPut("change-status-task/{idTask}")]
+    public async Task<IActionResult> ChangeStatusTask(int idTask)
+    {
+        return await taskService.ChangeStatusTask(idTask);
     }
 }

@@ -493,9 +493,6 @@ namespace CDE_Web_API.Migrations
                     b.Property<int>("RaterAccountId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RaterId")
-                        .HasColumnType("int");
-
                     b.Property<int>("TaskId")
                         .HasColumnType("int");
 
