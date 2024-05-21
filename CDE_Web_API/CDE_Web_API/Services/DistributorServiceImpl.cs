@@ -142,7 +142,7 @@ public class DistributorServiceImpl : DistributorService
         try
         {
             var distributor_find = await _dbContext.Distributors.FirstOrDefaultAsync(d => d.Id == id);
-            if (distributor_find == null || !distributor_find.Account.PositionTitle.Name.Equals("Distributor - OM/TL"))
+            if (distributor_find == null)
             {
                 return new BadRequestObjectResult(new { msg = "Distributor not exists or Invalid!" });
             }else
@@ -177,7 +177,7 @@ public class DistributorServiceImpl : DistributorService
                         return new BadRequestObjectResult(new { msg = "User " + user_sale.Id + " not exisit!" });
                     }
                     if (
-                        !user_sale.PositionTitle.PositionGroup.Name.Equals("Sale SUP – Sale Supervisor"))
+                        !user_sale.PositionTitle.Name.Equals("Sale SUP – Sale Supervisor"))
                     {
                         return new BadRequestObjectResult(new { msg = "Just sale SUP – Sale Supervisor!" });
                     }

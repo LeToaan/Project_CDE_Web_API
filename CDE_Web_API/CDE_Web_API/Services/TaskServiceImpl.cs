@@ -49,10 +49,10 @@ public class TaskServiceImpl : TaskService
 
             var report = await _dbContext.Accounts.FirstOrDefaultAsync(s => s.Id == task.Report);
             var implement = await _dbContext.Accounts.FirstOrDefaultAsync(i => i.Id== task.Implement);
-          /*  if(report.PositionGroupId != 2 || implement.PositionGroupId != 2 || report.PositionGroupId == 3 || implement.PositionGroupId == 3)
+            if (!report.PositionTitle.PositionGroup.Name.Equals("Sales") || !implement.PositionTitle.PositionGroup.Name.Equals("Sales") || (report == null || implement == null))
             {
                 return new BadRequestObjectResult(new { msg = "Report and Implement just position sales!" });
-            }*/
+            }
 
             task.Status = 1;
             task.VisitId = id;
@@ -151,7 +151,7 @@ public class TaskServiceImpl : TaskService
         try
         {
             var userLogin = _dbContext.Accounts.FirstOrDefault(a => a.Email == _authAccountService.getAccount());
-            var task = await _dbContext.Tasks.FindAsync(idTask);
+            var task = await _dbContext.Tasks.FirstOrDefaultAsync(t => t.Id == idTask);
             if (task == null)
             {
                 return new BadRequestObjectResult(new { msg = "Task not found!" });
@@ -184,7 +184,7 @@ public class TaskServiceImpl : TaskService
     {
         try
         {
-            var task = await _dbContext.Tasks.FindAsync(idTask);
+            var task = await _dbContext.Tasks.FirstOrDefaultAsync(t => t.Id == idTask);
             if(task == null)
             {
                 return new BadRequestObjectResult(new { msg = "Task not found!" });
@@ -211,7 +211,7 @@ public class TaskServiceImpl : TaskService
     {
         try
         {
-            var task = await _dbContext.Tasks.FindAsync(idTask);
+            var task = await _dbContext.Tasks.FirstOrDefaultAsync(t => t.Id == idTask);
             if (task == null)
             {
                 return new BadRequestObjectResult(new { msg = "Task not found!" });

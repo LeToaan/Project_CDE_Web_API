@@ -56,7 +56,7 @@ public class TaskController : Controller
 
     [Produces("application/json")]
     [Consumes("application/json")]
-    [HttpPost("comment_task/{idTask}")]
+    [HttpPost("comment-task/{idTask}")]
     public async Task<IActionResult> comment_task(int idTask,[FromBody] RateDTO rateDTO)
     {
         if (!ModelState.IsValid)
